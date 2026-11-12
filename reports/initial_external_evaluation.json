@@ -1,0 +1,59 @@
+{
+  "dataset": "NF-BoT-IoT v1",
+  "records": 600100,
+  "dataset_sha256": "0dcaeb12918dccee4127e537863366958a2fdc222fda06e0b1b0458c31a429ff",
+  "artifact_sha256": "5de1957c8dca2c9df61df956b6dd45c8c7f898f29d6a0b4c9a1e6b54a3283f66",
+  "threshold": 0.265,
+  "retrained_or_tuned_on_external_data": false,
+  "metrics": {
+    "records": 600100,
+    "attack_prevalence": 0.9769055157473754,
+    "average_precision": 0.98160128798447,
+    "roc_auc": 0.4990785279971095,
+    "precision": 0.9879051248019866,
+    "recall": 0.07872018504335247,
+    "f1": 0.14582079294736594,
+    "false_positive_rate": 0.040767732159607474,
+    "brier": 0.8699648086872745,
+    "log_loss": 7.365942001646897,
+    "confusion_matrix": [
+      [
+        13294,
+        565
+      ],
+      [
+        540092,
+        46149
+      ]
+    ]
+  },
+  "per_attack": {
+    "Benign": {
+      "records": 13859,
+      "correct_binary_decision_rate": 0.9592322678403925
+    },
+    "DDoS": {
+      "records": 56844,
+      "correct_binary_decision_rate": 0.28316093167264794
+    },
+    "DoS": {
+      "records": 56833,
+      "correct_binary_decision_rate": 0.2832157373357028
+    },
+    "Reconnaissance": {
+      "records": 470655,
+      "correct_binary_decision_rate": 0.029654417779477537
+    },
+    "Theft": {
+      "records": 1909,
+      "correct_binary_decision_rate": 0.0
+    }
+  },
+  "conformal_coverage": 0.012872854524245959,
+  "cleaning": "None; full external dataset used.",
+  "limitations": [
+    "Different lab dataset, features and attack prevalence; not production traffic.",
+    "Scores reflect domain shift. No retraining, threshold changes, or calibrator fitting use these labels.",
+    "Per-attack rates measure binary decisions, not family classification accuracy."
+  ]
+}

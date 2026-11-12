@@ -1,0 +1,52 @@
+# Explainability and model research
+
+Research checked on 12 November 2026 using original papers, maintainer documentation, and dataset publishers. This is a targeted literature review, not an exhaustive survey or a claim that a particular method is universally best.
+
+## Is there something more advanced than SHAP?
+
+There are methods that answer different questions. SHAP attributes a model output to features relative to a baseline. It does not establish causality, measure detection accuracy, estimate calibrated uncertainty, or show that changing a feature will prevent an attack. Keep attribution where it helps; compare explanation quality rather than replacing it for novelty alone.
+
+| Approach | What it adds | Evidence and date | Fit for this project |
+| --- | --- | --- | --- |
+| Constrained diverse counterfactuals | Shows alternative inputs that change the model output | [DiCE, authors' implementation](https://github.com/interpretml/DiCE), original FAT* 2020 paper | Practical next addition, with fixed protocol/category fields, valid ranges, and networking constraints. A score-changing input is not a mitigation instruction. |
+| Learned-manifold counterfactuals | Tries to keep alternatives closer to the learned tabular distribution | [TABCF](https://arxiv.org/abs/2410.10463), ICAIF 2024 | Research comparison. Its reported experiments use financial datasets; transfer to network flows must be evaluated. Adds VAE training and runtime complexity. |
+| Joint prediction and counterfactual generation | Builds local counterfactual explanations into the classifier | [HyConEx](https://arxiv.org/abs/2503.12525), March 2026 revision; paper identifies Neurocomputing 2026 publication | A verifiable 2026 direction. It is a different classification architecture, not a plugin replacement for explaining an existing forest. No superiority on this project's traffic is established. |
+| Intrinsically interpretable models | Exposes model terms directly, including selected interactions | [Explainable Boosting Machine, InterpretML](https://interpret.ml/docs/ebm.html) | Benchmark an EBM against boosted trees. This is established technology rather than a new 2026 method. Predictive performance still needs independent evaluation. |
+| Conformal uncertainty | Returns plausible label sets or regression intervals, with assumptions | [MAPIE theory](https://mapie.readthedocs.io/en/stable/content/conformal-prediction/theory/) | A useful complement to attribution. Standard marginal coverage needs exchangeability; dependent network flows and drift can violate it. Report empirical coverage, set size, and subgroup behavior. |
+| Counterfactuals for prediction sets | Explains changes to the whole conformal label set | [Maalej et al., PMLR 266](https://proceedings.mlr.press/v266/maalej25a.html), August 2025 | A research extension after classifier and uncertainty calibration are independently checked. Changes the question from one class label to uncertainty-aware decisions. |
+
+A 2026 industrial cybersecurity review discusses how operational usefulness and reliability remain open issues across explanation families; its arXiv version is a preprint, not proof of a new method outperforming all others. [Mohamed et al., August 2026](https://arxiv.org/abs/2609.00171)
+
+## Stronger predictive models are a separate question
+
+Gradient boosting and tree ensembles are sensible tabular baselines. A foundation model is an experiment, not an automatic upgrade. The January 2025 TabPFN paper reports strong small-data results on datasets up to 10,000 samples; that specific result does not justify assuming it wins on millions of correlated network flows. [Hollmann et al., Nature](https://www.nature.com/articles/s41586-024-08328-6)
+
+This repo now compares a trivial baseline, logistic regression, Extra Trees, and histogram gradient boosting under the same split. The final policy selects validation recall subject to a per-source false-positive target; average precision and Brier score break ties. Raw, sigmoid, and isotonic outputs are compared without using test labels for selection. Use validation data for model/threshold selection and a separate calibration set for probability calibration. Compare average precision, ROC AUC, attack recall, benign false-positive rate, Brier score, per-attack recall, and latency on untouched test data. A high accuracy alone is especially weak evidence on imbalanced data.
+
+If an EBM is later added, compare its direct explanations to the selected tree model's SHAP. For counterfactuals, measure validity, sparsity, plausibility, constraint violations, and runtime. For attributions, test sensitivity to background choice and correlated features. These experiments are future research work, not features already validated by this document.
+
+## Dataset decision
+
+There is no single best intrusion dataset for all deployment targets. Dataset age, label generation, attack coverage, feature extraction, host/capture leakage, and evaluation realism all matter.
+
+| Dataset | Useful properties | Practical limits |
+| --- | --- | --- |
+| [NF-ToN-IoT](https://staff.itee.uq.edu.au/marius/NIDS_datasets/) | Publisher provides labeled NetFlow data, 1,379,274 flows, benign traffic and nine attack categories. Compact v1 download supports a reproducible first training run. | Older lab benchmark, not 2026 production traffic. Basic NetFlow fields limit discrimination. Academic-use permission includes a commercial-use restriction. |
+| [NF-ToN-IoT-v3](https://staff.itee.uq.edu.au/marius/NIDS_datasets/) | Richer 53-feature collection; publisher describes 27,520,260 flows. | Much larger; temporal evaluation and artifact controls still required. A richer extraction does not itself remove benchmark bias. |
+| [CICIoT2023](https://www.unb.ca/cic/datasets/iotdataset-2023.html) | Real IoT topology with 105 devices and 33 attacks across seven families. | Official download currently presents a personal-information form. Capture-level leakage and class imbalance must be assessed. |
+| [CIC IoT-DIAD 2024](https://www.unb.ca/cic/datasets/iot-diad-2024.html) | Adds device identification and anomaly-detection features, including packet/flow and device-specific attributes. | Different task and extraction requirements; official download currently presents a personal-information form. |
+| [IoT-23](https://www.stratosphereips.org/datasets-iot23) | Explicit captures/scenarios support evaluation across malware captures. | Publisher's lighter labeled-flow download is 8.8 GB, and captures are from 2018–2019. |
+
+The first training dataset selected here is **NF-ToN-IoT v1**, obtained directly from [UQ's public delivery record](https://rdm.uq.edu.au/files/2ad93cd0-ef9c-11ed-827d-e762de186848). The choice favors a complete, accessible experiment with practical NetFlow inputs. It is not claimed to be the newest or universally best dataset. Preserve its citation and reuse terms. Raw data stay outside Git; record download checksums and training provenance.
+
+## Legacy artifact finding
+
+`reports/legacy_model_audit.json` records structural evidence against the old artifact's documented training story. In particular, documented 0/1 encoded fields split at thresholds other than 0.5, and single-observation leaves contain noninteger target values despite the documented integer severity map. Unrecorded transformations could explain parts of this; the original training history is missing. The artifact should not be promoted on the strength of its SHAP plots or demo scores.
+
+A new binary attack detector should predict the dataset's real binary label. A 0–10 probability-derived risk index is not a ground-truth severity scale. Explain this distinction in the UI and model card, and never claim that probability calibration or conformal sets prove production readiness.
+
+## Implemented experiment and remaining research
+
+The new detector uses nine raw NetFlow inputs and a saved preprocessing pipeline. A failed initial external evaluation motivated combined-source training on NF-ToN-IoT and NF-BoT-IoT. Final holdouts retain difficult ambiguous and repeated patterns; only fitting data are deduplicated. Earlier cleaned-subset experiments are archived and not presented as the final result. Detailed measured results are generated in [MODEL_CARD.md](MODEL_CARD.md).
+
+Implemented explanation/uncertainty tools are optional base-model SHAP, raw-feature permutation importance, calibration comparisons, and experimental split-conformal prediction sets. DiCE, TABCF, HyConEx and EBM comparisons are researched directions, **not implemented or validated features**. A future experiment should benchmark constrained counterfactuals against clear plausibility/validity criteria after fresh external validation of the detector itself.

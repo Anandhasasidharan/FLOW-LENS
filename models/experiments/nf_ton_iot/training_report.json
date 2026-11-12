@@ -1,0 +1,330 @@
+{
+  "created_at": "2026-11-12T10:08:14.141898+00:00",
+  "dataset": "NF-ToN-IoT v1",
+  "dataset_sha256": "43363378f620cfe38fda7c40cd5ef06b14e99715798a982b175d4b197f040567",
+  "python": "3.12.3",
+  "scikit_learn": "1.9.0",
+  "numpy": "2.4.6",
+  "pandas": "2.3.3",
+  "seed": 42,
+  "features": [
+    "L4_DST_PORT",
+    "PROTOCOL",
+    "L7_PROTO",
+    "IN_BYTES",
+    "OUT_BYTES",
+    "IN_PKTS",
+    "OUT_PKTS",
+    "TCP_FLAGS",
+    "FLOW_DURATION_MILLISECONDS"
+  ],
+  "cleaning": {
+    "original_records": 1379274,
+    "invalid_records_removed": 0,
+    "ambiguous_feature_records_removed": 20031,
+    "duplicate_feature_records_removed": 881712,
+    "retained_records": 477531,
+    "host_pairs": 1723,
+    "excluded_inputs": [
+      "IPV4_SRC_ADDR",
+      "IPV4_DST_ADDR",
+      "L4_SRC_PORT",
+      "Label",
+      "Attack"
+    ],
+    "caveat": "Metrics apply to the cleaned subset. Ambiguous/duplicate removal changes the population and is not directly comparable to full-dataset published results."
+  },
+  "split_method": "Disjoint unordered source/destination IPv4 host pairs; exact model-input duplicates removed globally before splitting.",
+  "split_counts": {
+    "train": {
+      "records": 226317,
+      "host_pairs": 825,
+      "benign": 73966,
+      "attack": 152351
+    },
+    "validation": {
+      "records": 41764,
+      "host_pairs": 207,
+      "benign": 2675,
+      "attack": 39089
+    },
+    "calibration": {
+      "records": 34327,
+      "host_pairs": 173,
+      "benign": 7775,
+      "attack": 26552
+    },
+    "conformal": {
+      "records": 55450,
+      "host_pairs": 173,
+      "benign": 4546,
+      "attack": 50904
+    },
+    "test": {
+      "records": 119673,
+      "host_pairs": 345,
+      "benign": 60507,
+      "attack": 59166
+    }
+  },
+  "fitted_records": 226317,
+  "validation_comparison": {
+    "dummy_prior": {
+      "records": 41764,
+      "attack_prevalence": 0.9359496216837467,
+      "average_precision": 0.9359496216837467,
+      "roc_auc": 0.5,
+      "precision": 0.9359496216837467,
+      "recall": 1.0,
+      "f1": 0.9669152659765253,
+      "false_positive_rate": 1.0,
+      "brier": 0.1289983048601035,
+      "log_loss": 0.4420312231653437,
+      "confusion_matrix": [
+        [
+          0,
+          2675
+        ],
+        [
+          0,
+          39089
+        ]
+      ],
+      "fit_seconds": 0.18430702199975713
+    },
+    "logistic_regression": {
+      "records": 41764,
+      "attack_prevalence": 0.9359496216837467,
+      "average_precision": 0.9996932918485558,
+      "roc_auc": 0.9972040703661402,
+      "precision": 0.9922216573462125,
+      "recall": 0.9985929545396403,
+      "f1": 0.9953971107626006,
+      "false_positive_rate": 0.11439252336448598,
+      "brier": 0.007567490195031955,
+      "log_loss": 0.0373755191952244,
+      "confusion_matrix": [
+        [
+          2369,
+          306
+        ],
+        [
+          55,
+          39034
+        ]
+      ],
+      "fit_seconds": 1.3164005170001474
+    },
+    "extra_trees": {
+      "records": 41764,
+      "attack_prevalence": 0.9359496216837467,
+      "average_precision": 0.9999536578019322,
+      "roc_auc": 0.9993074371617322,
+      "precision": 0.9913920065004317,
+      "recall": 0.9988231983422446,
+      "f1": 0.9950937288934766,
+      "false_positive_rate": 0.12672897196261682,
+      "brier": 0.00809824163983298,
+      "log_loss": 0.05982496263723232,
+      "confusion_matrix": [
+        [
+          2336,
+          339
+        ],
+        [
+          46,
+          39043
+        ]
+      ],
+      "fit_seconds": 14.04402594200019
+    },
+    "hist_gradient_boosting": {
+      "records": 41764,
+      "attack_prevalence": 0.9359496216837467,
+      "average_precision": 0.9999837843655567,
+      "roc_auc": 0.9997631573095952,
+      "precision": 0.9958958933442097,
+      "recall": 0.9994627644605899,
+      "f1": 0.9976761408616155,
+      "false_positive_rate": 0.06018691588785047,
+      "brier": 0.0036344385102689736,
+      "log_loss": 0.013168763174061715,
+      "confusion_matrix": [
+        [
+          2514,
+          161
+        ],
+        [
+          21,
+          39068
+        ]
+      ],
+      "fit_seconds": 12.58492435900007
+    }
+  },
+  "selected_model": "hist_gradient_boosting",
+  "selection_criterion": "Maximum validation average precision; test data excluded from selection.",
+  "threshold": 0.265,
+  "threshold_policy": "Maximum validation recall with benign false-positive rate <= 5%; engineering target, not a validated operational SLA.",
+  "test": {
+    "records": 119673,
+    "attack_prevalence": 0.4943972324584493,
+    "average_precision": 0.999968224200263,
+    "roc_auc": 0.9999598451899017,
+    "precision": 0.9984787532537778,
+    "recall": 0.998411249704222,
+    "f1": 0.9984450003380434,
+    "false_positive_rate": 0.0014874312063067083,
+    "brier": 0.0015703865493797455,
+    "log_loss": 0.00632332091388176,
+    "confusion_matrix": [
+      [
+        60417,
+        90
+      ],
+      [
+        94,
+        59072
+      ]
+    ],
+    "uncalibrated_brier": 0.0012296870637661954,
+    "inference_seconds": 1.403496264000296,
+    "records_per_second": 85267.77239784285
+  },
+  "per_attack_test": {
+    "Benign": {
+      "records": 60507,
+      "correct_binary_decision_rate": 0.9985125687936933
+    },
+    "backdoor": {
+      "records": 450,
+      "correct_binary_decision_rate": 0.9555555555555556
+    },
+    "ddos": {
+      "records": 10862,
+      "correct_binary_decision_rate": 0.9993555514638188
+    },
+    "injection": {
+      "records": 42322,
+      "correct_binary_decision_rate": 0.9992202636926422
+    },
+    "mitm": {
+      "records": 128,
+      "correct_binary_decision_rate": 0.765625
+    },
+    "ransomware": {
+      "records": 11,
+      "correct_binary_decision_rate": 0.9090909090909091
+    },
+    "scanning": {
+      "records": 5393,
+      "correct_binary_decision_rate": 0.9994437233450769
+    },
+    "dos": {
+      "records": 0,
+      "correct_binary_decision_rate": null
+    },
+    "password": {
+      "records": 0,
+      "correct_binary_decision_rate": null
+    },
+    "xss": {
+      "records": 0,
+      "correct_binary_decision_rate": null
+    }
+  },
+  "test_dummy": {
+    "records": 119673,
+    "attack_prevalence": 0.4943972324584493,
+    "average_precision": 0.4943972324584493,
+    "roc_auc": 0.5,
+    "precision": 0.4943972324584493,
+    "recall": 1.0,
+    "f1": 0.661667757032862,
+    "false_positive_rate": 1.0,
+    "brier": 0.2819301837265827,
+    "log_loss": 0.7610888290404562,
+    "confusion_matrix": [
+      [
+        0,
+        60507
+      ],
+      [
+        0,
+        59166
+      ]
+    ]
+  },
+  "conformal": {
+    "alpha": 0.1,
+    "q": 0.0005253014010070389,
+    "test_coverage": 0.8642383829268089,
+    "test_mean_set_size": 0.8642718073416727,
+    "test_ambiguous_fraction": 0.13572819265832728,
+    "caveat": "Empirical row-level coverage only. Correlated flows and distribution shift violate simple exchangeability assumptions; no deployment coverage guarantee."
+  },
+  "permutation_importance": [
+    {
+      "feature": "L4_DST_PORT",
+      "mean_ap_decrease": 0.22946564243383138,
+      "std": 0.002009942292076967
+    },
+    {
+      "feature": "PROTOCOL",
+      "mean_ap_decrease": -7.219242487810362e-06,
+      "std": 6.614995168235466e-07
+    },
+    {
+      "feature": "L7_PROTO",
+      "mean_ap_decrease": 0.00015330544714760771,
+      "std": 8.545484677760863e-05
+    },
+    {
+      "feature": "IN_BYTES",
+      "mean_ap_decrease": 2.9687401965331855e-05,
+      "std": 2.3695029093370527e-05
+    },
+    {
+      "feature": "OUT_BYTES",
+      "mean_ap_decrease": 5.9562276705708385e-05,
+      "std": 4.816931454085084e-05
+    },
+    {
+      "feature": "IN_PKTS",
+      "mean_ap_decrease": 5.523812065562813e-05,
+      "std": 2.303685051356779e-06
+    },
+    {
+      "feature": "OUT_PKTS",
+      "mean_ap_decrease": 8.720121982097595e-05,
+      "std": 7.12548853942241e-06
+    },
+    {
+      "feature": "TCP_FLAGS",
+      "mean_ap_decrease": 0.00010188734566525988,
+      "std": 6.179627811924656e-05
+    },
+    {
+      "feature": "FLOW_DURATION_MILLISECONDS",
+      "mean_ap_decrease": 0.0002286437119593717,
+      "std": 0.00019241881131435394
+    }
+  ],
+  "engineering_checks": {
+    "test_average_precision_above_prevalence": true,
+    "test_recall_at_least_90_percent": true,
+    "test_false_positive_rate_at_most_5_percent": true,
+    "host_pairs_disjoint": true
+  },
+  "status": "benchmark_targets_met",
+  "limitations": [
+    "Lab dataset with attack prevalence unlike many real networks; no real-world performance guarantee.",
+    "Host pairs are disjoint, but individual hosts can occur in multiple splits; no claim of unseen-host, temporal, or cross-dataset generalization.",
+    "Cleaning excludes ambiguous feature patterns and exact duplicates; metrics apply only to this cleaned population.",
+    "Binary labels are ground truth; risk score is 10 times estimated attack probability, not attack severity.",
+    "Sigmoid calibration may improve or worsen Brier score under a changed distribution; compare measured test values.",
+    "Per-attack detection rates are binary decisions, not attack-family classification accuracy.",
+    "DoS, password, and XSS have zero test support in this host-pair split. No test detection rate is established for those categories."
+  ],
+  "artifact_sha256": "5de1957c8dca2c9df61df956b6dd45c8c7f898f29d6a0b4c9a1e6b54a3283f66"
+}

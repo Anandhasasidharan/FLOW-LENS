@@ -1,0 +1,691 @@
+{
+  "created_at": "2026-11-12T10:21:54.187649+00:00",
+  "dataset": "NF-ToN-IoT v1 + NF-BoT-IoT v1",
+  "dataset_sha256": {
+    "NF-ToN-IoT.csv": "43363378f620cfe38fda7c40cd5ef06b14e99715798a982b175d4b197f040567",
+    "NF-BoT-IoT.csv": "0dcaeb12918dccee4127e537863366958a2fdc222fda06e0b1b0458c31a429ff"
+  },
+  "python": "3.12.3",
+  "scikit_learn": "1.9.0",
+  "numpy": "2.4.6",
+  "pandas": "2.3.3",
+  "seed": 42,
+  "features": [
+    "L4_DST_PORT",
+    "PROTOCOL",
+    "L7_PROTO",
+    "IN_BYTES",
+    "OUT_BYTES",
+    "IN_PKTS",
+    "OUT_PKTS",
+    "TCP_FLAGS",
+    "FLOW_DURATION_MILLISECONDS"
+  ],
+  "cleaning": {
+    "original_records": 1979374,
+    "invalid_records_removed": 0,
+    "ambiguous_feature_records_removed": 0,
+    "duplicate_feature_records_removed": 0,
+    "retained_records": 1979374,
+    "host_pairs": 1972,
+    "excluded_inputs": [
+      "IPV4_SRC_ADDR",
+      "IPV4_DST_ADDR",
+      "L4_SRC_PORT",
+      "Label",
+      "Attack"
+    ],
+    "caveat": "No label-based filtering or deduplication is applied to holdouts. Only fitting data are deduplicated. Natural repeated feature patterns may exist across distinct host pairs; novelty metrics are reported separately."
+  },
+  "split_method": "Disjoint (dataset source, unordered IPv4 host pair) groups; holdouts retain all valid records, including repeated and ambiguous feature patterns. Only fitting records are deduplicated on (inputs, binary target).",
+  "split_counts": {
+    "train": {
+      "records": 1087162,
+      "host_pairs": 945,
+      "benign": 143709,
+      "attack": 943453
+    },
+    "validation": {
+      "records": 133123,
+      "host_pairs": 237,
+      "benign": 21747,
+      "attack": 111376
+    },
+    "calibration": {
+      "records": 77237,
+      "host_pairs": 197,
+      "benign": 22803,
+      "attack": 54434
+    },
+    "conformal": {
+      "records": 140580,
+      "host_pairs": 198,
+      "benign": 10370,
+      "attack": 130210
+    },
+    "test": {
+      "records": 541272,
+      "host_pairs": 395,
+      "benign": 85509,
+      "attack": 455763
+    }
+  },
+  "fitted_records": 250000,
+  "fit_duplicates_removed": 725816,
+  "validation_comparison": {
+    "dummy_prior": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.8366397992833695,
+      "roc_auc": 0.5,
+      "precision": 0.8366397992833695,
+      "recall": 1.0,
+      "f1": 0.9110548509400856,
+      "false_positive_rate": 1.0,
+      "brier": 0.1411449481194537,
+      "log_loss": 0.45884063478660386,
+      "confusion_matrix": [
+        [
+          0,
+          21747
+        ],
+        [
+          0,
+          111376
+        ]
+      ],
+      "fit_seconds": 0.43816536700069264
+    },
+    "logistic_regression": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.9958757402911778,
+      "roc_auc": 0.9860879586916357,
+      "precision": 0.9703383501585879,
+      "recall": 0.9916050136474645,
+      "f1": 0.9808564209367077,
+      "false_positive_rate": 0.15523980319124478,
+      "brier": 0.028711635282726373,
+      "log_loss": 0.11739367956725395,
+      "confusion_matrix": [
+        [
+          18371,
+          3376
+        ],
+        [
+          935,
+          110441
+        ]
+      ],
+      "fit_seconds": 4.7018922719998955
+    },
+    "extra_trees": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.9993541518949639,
+      "roc_auc": 0.9969937946732066,
+      "precision": 0.9852185317783844,
+      "recall": 0.9982042809941101,
+      "f1": 0.9916688966193916,
+      "false_positive_rate": 0.07670023451510553,
+      "brier": 0.016921840917701176,
+      "log_loss": 0.08919384544802887,
+      "confusion_matrix": [
+        [
+          20079,
+          1668
+        ],
+        [
+          200,
+          111176
+        ]
+      ],
+      "fit_seconds": 30.545275258999936
+    },
+    "hist_gradient_boosting": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.9992407930569938,
+      "roc_auc": 0.9961663058945225,
+      "precision": 0.9909285523146909,
+      "recall": 0.9974590576066658,
+      "f1": 0.9941830808193802,
+      "false_positive_rate": 0.04676507104428197,
+      "brier": 0.0164628317889446,
+      "log_loss": 0.05645319304484321,
+      "confusion_matrix": [
+        [
+          20730,
+          1017
+        ],
+        [
+          283,
+          111093
+        ]
+      ],
+      "fit_seconds": 24.365591951999704
+    }
+  },
+  "validation_policies": {
+    "logistic_regression/raw": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.9958757402911778,
+      "roc_auc": 0.9860879586916357,
+      "precision": 0.9982121792981421,
+      "recall": 0.4862717281999713,
+      "f1": 0.6539678323029366,
+      "false_positive_rate": 0.004460385340506736,
+      "brier": 0.028711635282726373,
+      "log_loss": 0.11739367956725395,
+      "confusion_matrix": [
+        [
+          21650,
+          97
+        ],
+        [
+          57217,
+          54159
+        ]
+      ],
+      "threshold": 0.9991762177091835,
+      "source_false_positive_rates": {
+        "NF-BoT-IoT": 0.049886621315192746,
+        "NF-ToN-IoT": 0.00045038282540159135
+      }
+    },
+    "logistic_regression/sigmoid": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.9958757402911778,
+      "roc_auc": 0.9860879586916357,
+      "precision": 0.9982121792981421,
+      "recall": 0.4862717281999713,
+      "f1": 0.6539678323029366,
+      "false_positive_rate": 0.004460385340506736,
+      "brier": 0.08545076772482882,
+      "log_loss": 0.30675814918303684,
+      "confusion_matrix": [
+        [
+          21650,
+          97
+        ],
+        [
+          57217,
+          54159
+        ]
+      ],
+      "threshold": 0.8313375653122945,
+      "source_false_positive_rates": {
+        "NF-BoT-IoT": 0.049886621315192746,
+        "NF-ToN-IoT": 0.00045038282540159135
+      }
+    },
+    "logistic_regression/isotonic": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.9944091020558579,
+      "roc_auc": 0.982727995605944,
+      "precision": 0.9993424972775278,
+      "recall": 0.4366919264473495,
+      "f1": 0.6077915586241369,
+      "false_positive_rate": 0.0014714673288269647,
+      "brier": 0.03879164849066424,
+      "log_loss": 0.14685941672507657,
+      "confusion_matrix": [
+        [
+          21715,
+          32
+        ],
+        [
+          62739,
+          48637
+        ]
+      ],
+      "threshold": 0.9988961815841704,
+      "source_false_positive_rates": {
+        "NF-BoT-IoT": 0.015306122448979591,
+        "NF-ToN-IoT": 0.0002502126807786619
+      }
+    },
+    "extra_trees/raw": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.9993541518949639,
+      "roc_auc": 0.9969937946732066,
+      "precision": 0.9991706616501811,
+      "recall": 0.8870133601494038,
+      "f1": 0.939757431629013,
+      "false_positive_rate": 0.003770635030119097,
+      "brier": 0.016921840917701176,
+      "log_loss": 0.08919384544802887,
+      "confusion_matrix": [
+        [
+          21665,
+          82
+        ],
+        [
+          12584,
+          98792
+        ]
+      ],
+      "threshold": 0.909259374833986,
+      "source_false_positive_rates": {
+        "NF-BoT-IoT": 0.024376417233560092,
+        "NF-ToN-IoT": 0.0019516589100735625
+      }
+    },
+    "extra_trees/sigmoid": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.9993541518949639,
+      "roc_auc": 0.9969937946732066,
+      "precision": 0.9991706616501811,
+      "recall": 0.8870133601494038,
+      "f1": 0.939757431629013,
+      "false_positive_rate": 0.003770635030119097,
+      "brier": 0.09776953228241032,
+      "log_loss": 0.3467406405428153,
+      "confusion_matrix": [
+        [
+          21665,
+          82
+        ],
+        [
+          12584,
+          98792
+        ]
+      ],
+      "threshold": 0.7977043817896291,
+      "source_false_positive_rates": {
+        "NF-BoT-IoT": 0.024376417233560092,
+        "NF-ToN-IoT": 0.0019516589100735625
+      }
+    },
+    "extra_trees/isotonic": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.998662346899931,
+      "roc_auc": 0.9957822984822778,
+      "precision": 0.9994678869791944,
+      "recall": 0.6745798017526218,
+      "f1": 0.8054977807320368,
+      "false_positive_rate": 0.0018393341610337059,
+      "brier": 0.01953123623099684,
+      "log_loss": 0.07006822868643385,
+      "confusion_matrix": [
+        [
+          21707,
+          40
+        ],
+        [
+          36244,
+          75132
+        ]
+      ],
+      "threshold": 0.9963235294117642,
+      "source_false_positive_rates": {
+        "NF-BoT-IoT": 0.015873015873015872,
+        "NF-ToN-IoT": 0.0006005104338687885
+      }
+    },
+    "hist_gradient_boosting/raw": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.9992407930569938,
+      "roc_auc": 0.9961663058945225,
+      "precision": 0.9906912047934946,
+      "recall": 0.9975937365321075,
+      "f1": 0.9941304892451952,
+      "false_positive_rate": 0.04800662160297972,
+      "brier": 0.0164628317889446,
+      "log_loss": 0.05645319304484321,
+      "confusion_matrix": [
+        [
+          20703,
+          1044
+        ],
+        [
+          268,
+          111108
+        ]
+      ],
+      "threshold": 0.4588648516799336,
+      "source_false_positive_rates": {
+        "NF-BoT-IoT": 0.03344671201814059,
+        "NF-ToN-IoT": 0.04929189811339639
+      }
+    },
+    "hist_gradient_boosting/sigmoid": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.9992407930569938,
+      "roc_auc": 0.9961663058945225,
+      "precision": 0.9906912047934946,
+      "recall": 0.9975937365321075,
+      "f1": 0.9941304892451952,
+      "false_positive_rate": 0.04800662160297972,
+      "brier": 0.011761066301203929,
+      "log_loss": 0.05043056860384131,
+      "confusion_matrix": [
+        [
+          20703,
+          1044
+        ],
+        [
+          268,
+          111108
+        ]
+      ],
+      "threshold": 0.8041848891139294,
+      "source_false_positive_rates": {
+        "NF-BoT-IoT": 0.03344671201814059,
+        "NF-ToN-IoT": 0.04929189811339639
+      }
+    },
+    "hist_gradient_boosting/isotonic": {
+      "records": 133123,
+      "attack_prevalence": 0.8366397992833695,
+      "average_precision": 0.9990320357141628,
+      "roc_auc": 0.9970679790399138,
+      "precision": 0.9908225787750952,
+      "recall": 0.9974680362016951,
+      "f1": 0.994134201942738,
+      "false_positive_rate": 0.04731687129259208,
+      "brier": 0.01124256125973657,
+      "log_loss": 0.04480795688450437,
+      "confusion_matrix": [
+        [
+          20718,
+          1029
+        ],
+        [
+          282,
+          111094
+        ]
+      ],
+      "threshold": 0.9561243144424132,
+      "source_false_positive_rates": {
+        "NF-BoT-IoT": 0.031179138321995464,
+        "NF-ToN-IoT": 0.04874143021568333
+      }
+    }
+  },
+  "probability_policy": "sigmoid",
+  "selected_model": "hist_gradient_boosting",
+  "selection_criterion": "Maximum validation attack recall subject to each source benign FPR <=5%; ties broken by validation average precision then Brier score. Raw/sigmoid/isotonic policies compared; test data excluded from selection.",
+  "threshold": 0.8041848891139294,
+  "threshold_policy": "Maximum validation recall with benign false-positive rate <=5% for each represented source; engineering target, not a validated operational SLA.",
+  "test": {
+    "records": 541272,
+    "attack_prevalence": 0.8420221256595575,
+    "average_precision": 0.9999117791913907,
+    "roc_auc": 0.9995585964321724,
+    "precision": 0.9966984496497162,
+    "recall": 0.999530457715962,
+    "f1": 0.9981124448276277,
+    "false_positive_rate": 0.01764726520015437,
+    "brier": 0.00319953219579258,
+    "log_loss": 0.014127899714320647,
+    "confusion_matrix": [
+      [
+        84000,
+        1509
+      ],
+      [
+        214,
+        455549
+      ]
+    ],
+    "uncalibrated_brier": 0.0031717246450429807,
+    "inference_seconds": 7.855352751000282,
+    "records_per_second": 68904.86234766169
+  },
+  "novel_pattern_test": {
+    "records": 217233,
+    "fraction_of_test": 0.4013379594732408,
+    "metrics": {
+      "records": 217233,
+      "attack_prevalence": 0.7127416184465528,
+      "average_precision": 0.999950757402017,
+      "roc_auc": 0.9998830376634382,
+      "precision": 0.9938378697920682,
+      "recall": 0.9989536979028747,
+      "f1": 0.9963892172557407,
+      "false_positive_rate": 0.015368097176372553,
+      "brier": 0.004792834084027191,
+      "log_loss": 0.022669597007153198,
+      "confusion_matrix": [
+        [
+          61443,
+          959
+        ],
+        [
+          162,
+          154669
+        ]
+      ]
+    }
+  },
+  "group_bootstrap_95_intervals": {
+    "recall": [
+      0.9986082910130797,
+      0.9999418512367361
+    ],
+    "false_positive_rate": [
+      0.004009702664812646,
+      0.13777914960472476
+    ],
+    "precision": [
+      0.9888879121888038,
+      0.9990393623847367
+    ]
+  },
+  "per_attack_test": {
+    "NF-BoT-IoT / Benign": {
+      "records": 1167,
+      "correct_binary_decision_rate": 0.6743787489288775
+    },
+    "NF-BoT-IoT / DDoS": {
+      "records": 8693,
+      "correct_binary_decision_rate": 1.0
+    },
+    "NF-BoT-IoT / DoS": {
+      "records": 8693,
+      "correct_binary_decision_rate": 1.0
+    },
+    "NF-BoT-IoT / Reconnaissance": {
+      "records": 66028,
+      "correct_binary_decision_rate": 0.9979251226752287
+    },
+    "NF-BoT-IoT / Theft": {
+      "records": 0,
+      "correct_binary_decision_rate": null
+    },
+    "NF-ToN-IoT / Benign": {
+      "records": 84342,
+      "correct_binary_decision_rate": 0.986614023855256
+    },
+    "NF-ToN-IoT / backdoor": {
+      "records": 60,
+      "correct_binary_decision_rate": 0.2
+    },
+    "NF-ToN-IoT / ddos": {
+      "records": 163436,
+      "correct_binary_decision_rate": 0.9999877627939989
+    },
+    "NF-ToN-IoT / dos": {
+      "records": 8,
+      "correct_binary_decision_rate": 1.0
+    },
+    "NF-ToN-IoT / injection": {
+      "records": 104724,
+      "correct_binary_decision_rate": 0.999875864176311
+    },
+    "NF-ToN-IoT / mitm": {
+      "records": 79,
+      "correct_binary_decision_rate": 0.8227848101265823
+    },
+    "NF-ToN-IoT / password": {
+      "records": 87495,
+      "correct_binary_decision_rate": 1.0
+    },
+    "NF-ToN-IoT / ransomware": {
+      "records": 0,
+      "correct_binary_decision_rate": null
+    },
+    "NF-ToN-IoT / scanning": {
+      "records": 12713,
+      "correct_binary_decision_rate": 1.0
+    },
+    "NF-ToN-IoT / xss": {
+      "records": 3834,
+      "correct_binary_decision_rate": 1.0
+    }
+  },
+  "per_dataset_test": {
+    "NF-BoT-IoT": {
+      "records": 84581,
+      "attack_prevalence": 0.9862025750464052,
+      "average_precision": 0.9998296339057947,
+      "roc_auc": 0.9882313817396995,
+      "precision": 0.9954576425164661,
+      "recall": 0.9983575898530223,
+      "f1": 0.9969055072394372,
+      "false_positive_rate": 0.32562125107112255,
+      "brier": 0.00536752098210919,
+      "log_loss": 0.028050229071448017,
+      "confusion_matrix": [
+        [
+          787,
+          380
+        ],
+        [
+          137,
+          83277
+        ]
+      ]
+    },
+    "NF-ToN-IoT": {
+      "records": 456691,
+      "attack_prevalence": 0.8153193296999502,
+      "average_precision": 0.9999294842442816,
+      "roc_auc": 0.9997140541982121,
+      "precision": 0.9969764408772338,
+      "recall": 0.9997932047621989,
+      "f1": 0.9983828360710694,
+      "false_positive_rate": 0.013385976144744018,
+      "brier": 0.0027980120004407008,
+      "log_loss": 0.01154942862696576,
+      "confusion_matrix": [
+        [
+          83213,
+          1129
+        ],
+        [
+          77,
+          372272
+        ]
+      ]
+    }
+  },
+  "test_dummy": {
+    "records": 541272,
+    "attack_prevalence": 0.8420221256595575,
+    "average_precision": 0.8420221256595575,
+    "roc_auc": 0.5,
+    "precision": 0.8420221256595575,
+    "recall": 1.0,
+    "f1": 0.9142367118506372,
+    "false_positive_rate": 1.0,
+    "brier": 0.1382409462171397,
+    "log_loss": 0.4523440363568446,
+    "confusion_matrix": [
+      [
+        0,
+        85509
+      ],
+      [
+        0,
+        455763
+      ]
+    ]
+  },
+  "conformal": {
+    "alpha": 0.1,
+    "q": 0.009597245461488657,
+    "test_coverage": 0.9617013257659734,
+    "test_mean_set_size": 0.9624089182518216,
+    "test_ambiguous_fraction": 0.037591081748178365,
+    "caveat": "Empirical row-level coverage only. Correlated flows and distribution shift violate simple exchangeability assumptions; no deployment coverage guarantee."
+  },
+  "permutation_importance": [
+    {
+      "feature": "L4_DST_PORT",
+      "mean_ap_decrease": 0.044997391051789015,
+      "std": 0.0003178581057670573
+    },
+    {
+      "feature": "PROTOCOL",
+      "mean_ap_decrease": 2.148796707531394e-06,
+      "std": 2.020521629959282e-10
+    },
+    {
+      "feature": "L7_PROTO",
+      "mean_ap_decrease": 0.0010924867269639742,
+      "std": 0.00014152827325082532
+    },
+    {
+      "feature": "IN_BYTES",
+      "mean_ap_decrease": -4.2421208628110975e-05,
+      "std": 3.634054570883075e-05
+    },
+    {
+      "feature": "OUT_BYTES",
+      "mean_ap_decrease": 0.00017573557898054037,
+      "std": 3.1269004588454374e-05
+    },
+    {
+      "feature": "IN_PKTS",
+      "mean_ap_decrease": -7.617315725960694e-07,
+      "std": 1.656671072732016e-05
+    },
+    {
+      "feature": "OUT_PKTS",
+      "mean_ap_decrease": 4.6681301139532096e-05,
+      "std": 2.3863792828873786e-06
+    },
+    {
+      "feature": "TCP_FLAGS",
+      "mean_ap_decrease": 0.00032978831310293,
+      "std": 7.791479048039115e-05
+    },
+    {
+      "feature": "FLOW_DURATION_MILLISECONDS",
+      "mean_ap_decrease": 0.00011438830967040274,
+      "std": 0.00011896947313885174
+    }
+  ],
+  "engineering_checks": {
+    "test_average_precision_above_prevalence": true,
+    "test_recall_at_least_90_percent": true,
+    "test_false_positive_rate_at_most_5_percent": true,
+    "host_pairs_disjoint": true,
+    "every_attack_family_has_at_least_30_test_records": false,
+    "every_supported_attack_recall_at_least_90_percent": false,
+    "every_source_test_false_positive_rate_at_most_5_percent": false
+  },
+  "status": "benchmark_targets_not_met",
+  "experimental_history": "Initial single-source training failed an external NF-BoT-IoT challenge (7.87% recall). Combined-source training followed; sources had already been inspected. Full-raw-holdout design replaces the earlier cleaned-subset evaluation.",
+  "limitations": [
+    "Lab dataset with attack prevalence unlike many real networks; no real-world performance guarantee.",
+    "The combined-data experiment was designed after a failed NF-BoT-IoT external challenge. Its dataset sources were previously inspected; this is not a pristine external validation.",
+    "Host pairs are disjoint, but individual hosts can occur in multiple splits; no claim of unseen-host, temporal, or cross-dataset generalization.",
+    "Holdouts retain ambiguous and repeated patterns. Training-only deduplication changes fitting weights; probability calibration uses a separate raw holdout.",
+    "Binary labels are ground truth; risk score is 10 times estimated attack probability, not attack severity.",
+    "Raw, sigmoid and isotonic probability policies were compared on validation data. Their probability reliability and decision thresholds may fail under distribution shift.",
+    "Per-attack detection rates are binary decisions, not attack-family classification accuracy.",
+    "This host-pair test partition was inspected across pipeline revisions. Results are exploratory and need confirmation on a fresh locked test source or capture."
+  ],
+  "artifact_sha256": "b652d406ee718f8a9dab649f655167cb9f7d3ab39d0812dbd6cff023c62e8d18"
+}

@@ -1,0 +1,11 @@
+{
+  "dataset": "NF-ToN-IoT",
+  "source": "https://rdm.uq.edu.au/files/2ad93cd0-ef9c-11ed-827d-e762de186848",
+  "reference_page": "https://staff.itee.uq.edu.au/marius/NIDS_datasets/",
+  "license": "Permitted Re-Use with Commercial Use Restriction",
+  "citation": "Sarhan, Layeghy, Moustafa, Portmann (2021). NetFlow Datasets for Machine Learning-Based Network Intrusion Detection Systems.",
+  "archive_sha256": "8f580f3ab7e6d6d6b6b297a8d30f4da15c0b96e15e647da8554574e56a2330be",
+  "csv_sha256": "43363378f620cfe38fda7c40cd5ef06b14e99715798a982b175d4b197f040567",
+  "archive_bytes": 8676145,
+  "csv_bytes": 97593229
+}

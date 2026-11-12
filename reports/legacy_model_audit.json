@@ -1,0 +1,149 @@
+{
+  "status": "incompatible_with_documented_preprocessing",
+  "accuracy_evaluated": false,
+  "trees": 50,
+  "feature_thresholds": [
+    {
+      "feature": "duration",
+      "split_count": 522,
+      "minimum_threshold": 0.0047551963943988085,
+      "maximum_threshold": 0.987124115228653
+    },
+    {
+      "feature": "sbytes",
+      "split_count": 532,
+      "minimum_threshold": 0.004712169902632013,
+      "maximum_threshold": 0.9885097444057465
+    },
+    {
+      "feature": "dbytes",
+      "split_count": 473,
+      "minimum_threshold": 0.0023234019172377884,
+      "maximum_threshold": 0.9945455491542816
+    },
+    {
+      "feature": "sttl",
+      "split_count": 495,
+      "minimum_threshold": 0.008896287043171469,
+      "maximum_threshold": 0.9956381320953369
+    },
+    {
+      "feature": "dttl",
+      "split_count": 510,
+      "minimum_threshold": 0.00744869967456907,
+      "maximum_threshold": 0.9816548526287079
+    },
+    {
+      "feature": "sloss",
+      "split_count": 544,
+      "minimum_threshold": 0.012310970574617386,
+      "maximum_threshold": 0.9964927434921265
+    },
+    {
+      "feature": "dloss",
+      "split_count": 517,
+      "minimum_threshold": 0.0037575012538582087,
+      "maximum_threshold": 0.9863883256912231
+    },
+    {
+      "feature": "spkts",
+      "split_count": 540,
+      "minimum_threshold": 0.003270455397796468,
+      "maximum_threshold": 0.9980042278766632
+    },
+    {
+      "feature": "dpkts",
+      "split_count": 525,
+      "minimum_threshold": 0.007907707942649722,
+      "maximum_threshold": 0.9926988780498505
+    },
+    {
+      "feature": "proto_icmp",
+      "split_count": 540,
+      "minimum_threshold": 0.01822473108768463,
+      "maximum_threshold": 0.998721182346344
+    },
+    {
+      "feature": "proto_tcp",
+      "split_count": 521,
+      "minimum_threshold": 0.01564116356894374,
+      "maximum_threshold": 0.9903488159179688
+    },
+    {
+      "feature": "proto_udp",
+      "split_count": 504,
+      "minimum_threshold": 0.005432311678305268,
+      "maximum_threshold": 0.995625227689743
+    },
+    {
+      "feature": "service_dns",
+      "split_count": 491,
+      "minimum_threshold": 0.011101858224719763,
+      "maximum_threshold": 0.996485561132431
+    },
+    {
+      "feature": "service_ftp",
+      "split_count": 461,
+      "minimum_threshold": 0.007768870098516345,
+      "maximum_threshold": 0.9917495250701904
+    },
+    {
+      "feature": "service_http",
+      "split_count": 529,
+      "minimum_threshold": 0.0018879084382206202,
+      "maximum_threshold": 0.9911545813083649
+    },
+    {
+      "feature": "service_smtp",
+      "split_count": 502,
+      "minimum_threshold": 0.006955982884392142,
+      "maximum_threshold": 0.9969787299633026
+    },
+    {
+      "feature": "service_-",
+      "split_count": 546,
+      "minimum_threshold": 0.010632169898599386,
+      "maximum_threshold": 0.9908017516136169
+    },
+    {
+      "feature": "state_CON",
+      "split_count": 501,
+      "minimum_threshold": 0.013127749785780907,
+      "maximum_threshold": 0.9937037527561188
+    },
+    {
+      "feature": "state_FIN",
+      "split_count": 564,
+      "minimum_threshold": 0.008762804791331291,
+      "maximum_threshold": 0.992499053478241
+    },
+    {
+      "feature": "state_INT",
+      "split_count": 501,
+      "minimum_threshold": 0.015568310162052512,
+      "maximum_threshold": 0.9980488419532776
+    }
+  ],
+  "binary_features_with_non_midpoint_splits": [
+    "proto_icmp",
+    "proto_tcp",
+    "proto_udp",
+    "service_dns",
+    "service_ftp",
+    "service_http",
+    "service_smtp",
+    "service_-",
+    "state_CON",
+    "state_FIN",
+    "state_INT"
+  ],
+  "single_observation_leaves": 7673,
+  "noninteger_single_observation_leaf_fraction": 1.0,
+  "interpretation": [
+    "Binary 0/1 encoded fields should split at 0.5. Other thresholds are inconsistent with the documented raw/one-hot training path.",
+    "A one-observation leaf with a noninteger target is inconsistent with the documented integer severity mapping.",
+    "This does not prove the origin of the model or whether an unrecorded transformation was used.",
+    "Neither structural checks nor explanations measure predictive accuracy."
+  ],
+  "artifact_sha256": "9f4f6cc21f725a06a83bf5a5c18e82048663e58d4c3e691fcfe1afd6877b3711"
+}
