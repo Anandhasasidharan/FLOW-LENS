@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">FlowLens — Interpretable Network Intrusion Detection</title>
+  <desc id="desc">A vivid network flow visualization with an explainable model and security signal paths.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#10162f"/><stop offset=".55" stop-color="#152a54"/><stop offset="1" stop-color="#20164b"/></linearGradient>
+    <linearGradient id="accent" x1="0" x2="1"><stop stop-color="#4de2c5"/><stop offset=".5" stop-color="#7b8cff"/><stop offset="1" stop-color="#e17cff"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#645cff" stop-opacity=".44"/><stop offset="1" stop-color="#645cff" stop-opacity="0"/></radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+  </defs>
+  <rect width="1200" height="360" rx="28" fill="url(#bg)"/>
+  <circle cx="1010" cy="30" r="245" fill="url(#glow)" filter="url(#soft)"/>
+  <g fill="none" stroke="url(#accent)" stroke-opacity=".28" stroke-width="2">
+    <path d="M700 50 820 105 935 65 1080 125 1170 82"/><path d="M670 160 790 220 920 165 1030 240 1180 195"/>
+    <path d="M720 300 835 255 965 300 1080 250 1185 290"/><path d="M820 105 790 220 835 255M935 65 920 165 965 300M1080 125 1030 240 1080 250"/>
+  </g>
+  <g fill="#72f0d0"><circle cx="700" cy="50" r="5"/><circle cx="820" cy="105" r="6"/><circle cx="935" cy="65" r="5"/><circle cx="1080" cy="125" r="7"/><circle cx="790" cy="220" r="5"/><circle cx="920" cy="165" r="7"/><circle cx="1030" cy="240" r="5"/><circle cx="965" cy="300" r="6"/></g>
+  <g font-family="Arial,Helvetica,sans-serif">
+    <rect x="64" y="52" width="185" height="34" rx="17" fill="#253a69" stroke="#5472ae"/>
+    <circle cx="84" cy="69" r="5" fill="#56e5c2"/><text x="99" y="74" fill="#c7d6ff" font-size="14" letter-spacing="2">NETWORK INTELLIGENCE</text>
+    <text x="62" y="164" fill="#ffffff" font-size="68" font-weight="700" letter-spacing="-2">FlowLens</text>
+    <text x="66" y="207" fill="#d2dcff" font-size="23">Interpretable Network Intrusion Detection</text>
+    <text x="66" y="258" fill="#aebde5" font-size="16">Explainable Boosting Machine  ·  Native explanations  ·  Reproducible evaluation</text>
+    <rect x="66" y="292" width="245" height="3" rx="2" fill="url(#accent)"/>
+    <text x="66" y="326" fill="#83f0d7" font-size="14" font-weight="700" letter-spacing="1.5">48 FLOW FEATURES</text>
+    <circle cx="243" cy="321" r="3" fill="#8fa2da"/><text x="260" y="326" fill="#c8d0ee" font-size="14">Exact probability breakdowns</text>
+  </g>
+  <g transform="translate(885 108)">
+    <circle cx="110" cy="72" r="80" fill="#151d3e" stroke="#5666a2" stroke-width="2"/>
+    <circle cx="110" cy="72" r="62" fill="none" stroke="#3f4e83" stroke-width="1" stroke-dasharray="3 7"/>
+    <path d="M110 10 A62 62 0 1 1 55 44" fill="none" stroke="url(#accent)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M110 72 151 41" stroke="#ec8aff" stroke-width="3" stroke-linecap="round"/><circle cx="110" cy="72" r="6" fill="#fff"/>
+    <text x="110" y="82" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="27" font-weight="700">EBM</text>
+    <text x="110" y="177" text-anchor="middle" fill="#bac8f4" font-family="Arial,sans-serif" font-size="13" letter-spacing="1.5">MODEL INSIGHT</text>
+  </g>
+</svg>

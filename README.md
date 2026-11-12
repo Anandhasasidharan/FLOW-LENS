@@ -1,168 +1,153 @@
-# FlowLens
+<div align="center">
+  <img src="assets/flowlens-banner.svg" alt="FlowLens — Interpretable Network Intrusion Detection" width="100%" />
 
-### Interpretable Network Intrusion Detection
+  <br />
 
-A network-traffic analysis workspace powered by an **Explainable Boosting Machine (EBM)**. FlowLens combines a richer NetFlow model, native feature explanations, interactive investigation, and reproducible evaluation.
+  <a href="https://github.com/Anandhasasidharan/FLOW-LENS/stargazers"><img src="https://img.shields.io/github/stars/Anandhasasidharan/FLOW-LENS?style=for-the-badge&logo=github&color=7c6cff&label=STARS" alt="GitHub stars" /></a>
+  <a href="https://github.com/Anandhasasidharan/FLOW-LENS/commits/main"><img src="https://img.shields.io/github/last-commit/Anandhasasidharan/FLOW-LENS?style=for-the-badge&logo=git&color=42cdb2" alt="Last commit" /></a>
+  <img src="https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.11 or later" />
+  <img src="https://img.shields.io/badge/Model-Explainable%20Boosting-9B72CF?style=for-the-badge" alt="Explainable Boosting Machine" />
 
-**The v2 model uses 48 raw measurements and 8 engineered features, fitted on 1,419,227 flows.** Its explanations reconstruct the deployed probability, including sigmoid calibration, without an optional SHAP dependency.
+  <h3>See the signal. Understand the decision.</h3>
+  <p>Explore network flows, detect attack-like traffic, and inspect the model's own feature-by-feature reasoning.</p>
 
-[Quick start](#quick-start) · [Measured results](#measured-results) · [Model card](docs/MODEL_CARD_V2.md) · [Reproduce training](#reproduce-the-experiment) · [Demo walkthrough](DEMO.md)
+  <a href="#get-started">Launch locally</a> · <a href="#benchmark-snapshot">Benchmark</a> · <a href="DEMO.md">Demo walkthrough</a> · <a href="docs/MODEL_CARD_V2.md">Model card</a>
+</div>
 
-## What you can do
+<br />
 
-- Load real development examples or upload NetFlow CSV records.
-- Review attack-likelihood distributions and protocol/port activity.
-- Filter traffic and inspect individual predictions.
-- See which native feature contributions raise or lower a record's risk.
-- Explore learned feature-effect curves and missing-value behavior.
-- Compare the EBM against two LightGBM references on the same reserved test.
-- Export predictions, filtered traffic, and measured evaluation evidence.
+## At a glance
 
-The target is **benign versus attack**. The displayed 0–10 risk index is estimated attack probability × 10; it does not estimate attack damage or severity.
+| **1,419,227**<br/>training flows | **48 + 8**<br/>raw + engineered features | **354,814**<br/>chronological test flows | **Native**<br/>interpretable predictions |
+|:---:|:---:|:---:|:---:|
 
-## Measured results
+FlowLens is an interactive network traffic analysis workspace powered by an **Explainable Boosting Machine (EBM)**. It combines a richer NetFlow model, native feature explanations, and a reproducible evaluation pipeline.
 
-The active model is a native additive EBM with sigmoid probability calibration. The final test was reserved before model development and scored after the model, probability policy, references, and thresholds were frozen.
+> **What the score means:** the model predicts benign versus attack. The dashboard's 0–10 risk index is estimated attack probability × 10; it does not estimate attack damage or severity.
 
-**Final test: 354,814 chronologically later flows — 31,107 attacks and 323,707 benign flows.**
+## Explore FlowLens
 
-| Model | Detected attacks | False positives | Benign false-positive rate |
-| --- | ---: | ---: | ---: |
+- **See the traffic:** inspect attack-likelihood distributions, protocol and port activity, and filtered flows.
+- **Inspect a prediction:** view the feature contributions that raise or lower the selected record's attack probability.
+- **Understand model behavior:** explore native feature effects, importance, and handling of missing or unknown values.
+- **Keep the evidence:** export predictions, filtered traffic, and evaluation results.
+
+## Benchmark snapshot
+
+### Chronological holdout · 354,814 flows · 31,107 attacks · 323,707 benign
+
+| Model | Attacks detected | False positives | Benign false-positive rate |
+|:--|--:|--:|--:|
 | Nine-input LightGBM reference | 31,107 / 31,107 | 450 | 0.139015% |
-| Rich-feature LightGBM | 31,107 / 31,107 | 4 | 0.001236% |
+| Rich-feature LightGBM reference | 31,107 / 31,107 | 4 | 0.001236% |
 | **FlowLens EBM** | **31,107 / 31,107** | **2** | **0.000618%** |
 
-All nine attack families were present in the final test. EBM precision was **99.9936%**, and all predeclared release quality checks passed. Both LightGBM references use the same full training partition, selected LightGBM parameters, and eight derived features; their raw-input profiles differ.
+**EBM precision: 99.9936%.** All nine attack families appeared in the final test, and all predeclared release checks passed. Both LightGBM references use the same full training partition, selected parameters, and eight derived features; their raw input profiles differ.
 
-These are results from one laboratory dataset's chronological holdout, not a promise of performance on arbitrary networks. Rare categories have limited support, including 37 Worms records. See the [model card](docs/MODEL_CARD_V2.md) for per-family counts, calibration diagnostics, dominant features, and scope.
+These measurements describe one laboratory dataset's chronological holdout. They do not establish performance on arbitrary networks. The dataset contains 37 Worms examples in the final test; per-family counts, calibration diagnostics, and scope are in the [model card](docs/MODEL_CARD_V2.md).
 
-## Interpretation is built into the model
+## How the explanation works
 
-An EBM learns feature-effect functions that add to a decision score. FlowLens uses the fitted terms directly:
+The EBM's learned feature effects add up to a decision score. For the deployed sigmoid-calibrated model, FlowLens transforms those terms so they reconstruct the **actual deployed probability**. The inspector checks this reconstruction against the classifier.
 
 ```text
-final log-odds = calibrated intercept + sum(calibrated feature contributions)
-attack probability = sigmoid(final log-odds)
+calibrated log-odds = intercept + Σ(feature contributions)
+attack probability  = sigmoid(calibrated log-odds)
 ```
 
-For the selected sigmoid calibration policy, its scale and offset preserve this additive representation. The record inspector checks the reconstruction against the actual deployed classifier.
+The application shows signed contributions for an individual flow, global feature importance, and effect curves. Missing and unknown-category contributions are shown separately. These explain the fitted model; they do not imply causation. **V2 works without SHAP.**
 
-- **Record contributions:** Signed terms explain the selected record's final attack probability.
-- **Feature effects:** Curves show how observed values contribute to the base model's log-odds.
-- **Native importance:** Mean absolute term contributions summarize model behavior.
-- **Missing and unknown values:** Their learned contributions are disclosed separately from observed-value curves.
+```mermaid
+flowchart LR
+    A[NetFlow CSV] --> B[Validate & engineer 8 features]
+    B --> C[EBM · 48 raw + engineered]
+    C --> D[Calibrated attack probability]
+    C --> E[Native feature contributions]
+    D --> F[Interactive FlowLens dashboard]
+    E --> F
+    F --> G[Inspect · Filter · Export]
+    style A fill:#e9f8ff,stroke:#23a6c7,color:#142d44
+    style B fill:#e8fff7,stroke:#21aa86,color:#142d44
+    style C fill:#f0ebff,stroke:#8662d5,color:#30204f
+    style D fill:#fff2dc,stroke:#e3a037,color:#463316
+    style E fill:#ffe9f6,stroke:#d75eaa,color:#48213c
+    style F fill:#e9edff,stroke:#596be0,color:#202855
+    style G fill:#eaffed,stroke:#48ad61,color:#183a21
+```
 
-These explanations describe the fitted model; they do not establish causality or provide remediation instructions. Optional SHAP support remains in the historical v1 path, but v2 explanations work without it.
+## Get started
 
-## Quick start
+### 1 · Create an environment
 
-Use **Python 3.11 or later**; the recorded training environment used Python 3.12.
+Use **Python 3.11 or later** (the recorded training environment uses Python 3.12).
 
 ```bash
 python -m venv .venv
 ```
 
-Activate with `source .venv/bin/activate` on Linux/macOS or `.venv\Scripts\Activate.ps1` in Windows PowerShell, then:
+Activate it with `source .venv/bin/activate` on Linux/macOS or `.venv\Scripts\Activate.ps1` in Windows PowerShell.
+
+### 2 · Install and launch
 
 ```bash
 python -m pip install -r requirements.txt
 python -m streamlit run app/streamlit_visualizer.py
 ```
 
-Open the URL printed by Streamlit, normally `http://localhost:8501`. Choose **Load sample traffic** to explore ten feature-only development examples, including benign traffic and nine attack families.
+Open the local URL printed by Streamlit, usually `http://localhost:8501`. Choose **Load sample traffic** to explore ten development examples: benign traffic plus nine attack families. The trained model is included; you don't need the full dataset to run the app.
 
-The trained model is included; full datasets are not required to run the app. Launch from the repository root for the configured dark theme. Restart Streamlit after replacing a model release to refresh its cached artifact and evidence.
+## Use your own traffic
 
-## Input format
+Download the current sample from the app or start with [`data/rich_flow_sample.csv`](data/rich_flow_sample.csv), which contains the active model's 48-column input schema. Historical nine-field samples are not inputs to v2.
 
-Download the current sample from the app or use [data/rich_flow_sample.csv](data/rich_flow_sample.csv). It contains the exact 48-column schema. The historical nine-field samples are not inputs for the active v2 model.
+The measurements include ports, protocols, TCP flags, byte and packet counts, rates, packet sizes, retransmissions, TCP windows, DNS, FTP, ICMP, TTL, and inter-packet timing. Eight additional features are computed per row. Absolute timestamps, endpoint IPs, DNS transaction IDs, and labels are excluded from inference.
 
-The richer measurements cover:
+Upload UTF-8 CSV with headers, up to **50 MB / 100,000 rows**. Empty numeric measurements are supported. Invalid numeric text, infinite values, duplicate headers, and entirely empty records are rejected. No missing measurements are silently replaced with zero. See the [publisher's feature definitions](data/netflow_v3_features.csv).
 
-- Source/destination ports, protocol identifiers, and TCP flags.
-- Bytes, packets, durations, sizes, and directional throughput.
-- Retransmissions, packet-size distributions, and TCP windows.
-- DNS, FTP, ICMP, TTL, and inter-packet arrival statistics.
-
-Eight derived features add aggregate counts, directional ratios, rates, and bytes per packet. They are computed from each record by the saved feature builder. Absolute timestamps, endpoint IPs, DNS transaction IDs, and labels are excluded from the model.
-
-See the [publisher's feature definitions](data/netflow_v3_features.csv). Upload UTF-8 CSVs with headers, up to **50 MB / 100,000 rows**. Empty numeric measurements are handled natively; nonnumeric text, infinite input values, duplicate headers, and entirely empty records are rejected. Examples encode nonfinite publisher readings as empty cells. No missing measurements are silently replaced with zero.
-
-Results include `Attack_Probability`, `Risk_Score`, `Predicted_Attack`, and `Risk_Category`. Display bands are Low (<3), Medium (3–<7), and High (≥7); they are separate from the binary decision threshold chosen on validation data.
-
-Extra fields are excluded from inference and retained for export. Generated model outputs and dashboard aliases replace uploaded fields with matching names. Filtered exports preserve original source-row references; formula-like text is escaped for spreadsheet opening.
-
-## Training and evaluation design
-
-**Data:** [NF-UNSW-NB15-v3 from the University of Queensland](https://staff.itee.uq.edu.au/marius/NIDS_datasets/), with 2,365,424 flows and richer temporal/packet statistics. The original traffic is from 2015; v3 provides a newer extraction, not contemporary production traffic.
-
-1. Reserve chronological fitting, validation, calibration, and final-test partitions at 60/15/10/15 percent flow-start quantiles.
-2. Purge flows crossing partition boundaries using their flow-end timestamps.
-3. Screen EBM and LightGBM parameters on smaller development samples, including a TTL-free ablation.
-4. Fit finalists on **all 1,419,227 eligible training records**, without the old final-fit sample cap.
-5. Compare probability policies and choose validation macro attack-family recall at a benign false-positive target of 1%.
-6. Prefer native EBM interpretation when its validation performance is within one percentage point of the predictive challenger.
-7. Freeze the artifacts and evaluate the previously unopened final partition once.
-
-The [evaluation plan](models/v2/evaluation_plan.json), [development trials](models/v2/development_trials.json), [development report](models/v2/development_report.json), [final evaluation](models/v2/final_evaluation.json), and [feature audit](models/v2/feature_audit.json) make these choices inspectable. Native explanations are checked against actual model predictions.
+Predictions include `Attack_Probability`, `Risk_Score`, `Predicted_Attack`, and `Risk_Category`. Display bands are Low (<3), Medium (3–<7), High (≥7); these are separate from the binary decision threshold. Extra fields are excluded from inference and retained for export.
 
 ## Reproduce the experiment
 
-Install training dependencies and prepare the publisher's data:
+The source is [NF-UNSW-NB15-v3 from the University of Queensland](https://staff.itee.uq.edu.au/marius/NIDS_datasets/), with 2,365,424 flows and richer temporal and packet statistics. The original traffic is from **2015**; this is a richer extraction, not contemporary production traffic.
+
+The experiment reserves chronological fitting, validation, calibration, and final-test partitions at 60/15/10/15 percent flow-start quantiles, purges flows crossing boundaries, screens parameters on development samples, then fits finalists on **all 1,419,227 eligible training records**. The final partition was evaluated after the model, probability policy, references, and thresholds were frozen.
 
 ```bash
 python -m pip install -r requirements-training.txt
 python scripts/fetch_rich_dataset.py
 python scripts/prepare_rich_data.py
-```
-
-Replay the public benchmark in a separate directory, preserving the active release:
-
-```bash
 python scripts/train_interpretable_v2.py --output models/experiments/v2-reproduction
 python scripts/freeze_reference_models_v2.py --experiment-dir models/experiments/v2-reproduction
 python scripts/evaluate_interpretable_v2.py --experiment-dir models/experiments/v2-reproduction
-python scripts/write_interpretable_model_card.py --experiment-dir models/experiments/v2-reproduction --output docs/MODEL_CARD_V2_REPRODUCTION.md
 ```
 
-The default training output is `models/v2` for an initial experiment. A scored release is preserved; use `--output` for subsequent work. A replay of an already published split is explicitly labeled as a reproduction, not a new blind evaluation. Future model development needs a fresh independent test for new generalization claims.
+Raw downloads and prepared data stay in ignored `data/raw/`. The [evaluation plan](models/v2/evaluation_plan.json), [development trials](models/v2/development_trials.json), [final evaluation](models/v2/final_evaluation.json), [feature audit](models/v2/feature_audit.json), and [dataset provenance](data/rich_dataset_provenance.json) document the experiment. Replaying the published split is a reproduction, not a new blind evaluation.
 
-Raw downloads and prepared datasets stay in ignored `data/raw/`. [Dataset provenance](data/rich_dataset_provenance.json) records the official source and file hashes. [Environment metadata](models/v2/environment.json) records the versions used. Prepared data can be reconstructed from a fresh clone without changing the frozen evaluation plan.
-
-## Verification
+## Run the checks
 
 ```bash
 python -m pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-Checks cover schema validation, artifact integrity, temporal separation, clone reconstruction, prediction parity, optional legacy explanations, native contribution reconstruction, operation without SHAP, exports, uploads, filters, and the demo lifecycle. The software test suite is separate from measured model performance.
+The software checks cover schema validation, artifact integrity, temporal separation, prediction parity, native explanation reconstruction without SHAP, uploads, exports, filters, and dashboard behavior. Software test results are separate from model benchmark performance.
 
-Browser appearance has not been visually verified in this workspace; Streamlit interactions are checked with its application test runner.
+## Project map
 
-## Repository
+| Path | What's inside |
+|:--|:--|
+| `app/` | Interactive dashboard and native explanation views |
+| `src/interpretable_detector.py` | Rich feature engineering and exact EBM explanations |
+| `scripts/` | Download, preparation, training, freezing, and evaluation |
+| `models/v2/` | Active model and evaluation evidence |
+| `data/` | Feature definitions, sample traffic, and source provenance |
+| `notebooks/` | Exploration and model inspection |
+| `docs/` | Model cards, research review, and archived history |
 
-```text
-app/                      Analysis workspace and native explanation views
-src/interpretable_detector.py
-                          Rich features and exact EBM explanations
-scripts/                  Download, preparation, search, freezing, and evaluation
-models/v2/                Active model, evaluation plan, references, and evidence
-data/                     Feature definitions, development sample, and provenance
-notebooks/                Exploration and model inspection
-reports/                  Historical artifact audits and experiments
-tests/                    Model, inference, and dashboard checks
-docs/                     Model cards, research, and historical documentation
-```
+## More
 
-[DEMO.md](DEMO.md) provides a presentation walkthrough. [The research review](docs/EXPLAINABILITY_RESEARCH_2026.md) covers EBM, counterfactuals, HyConEx, and uncertainty methods. [The deployment guide](PRODUCTION_READY_GUIDE.md) lists operational work beyond this benchmark.
+[Demo walkthrough](DEMO.md) · [Model card](docs/MODEL_CARD_V2.md) · [2026 interpretability review](docs/EXPLAINABILITY_RESEARCH_2026.md) · [Operational next steps](PRODUCTION_READY_GUIDE.md) · [Archived v1 README](docs/history/README_V1.md)
 
-## Scope and next work
-
-The new release has strong measured detection and faithful interpretation on its reserved benchmark. A separate environment or future capture remains the next independent evaluation. Ports, protocol behavior, and TTL patterns can reflect a laboratory's traffic generator, so feature interpretation and testing across environments remain important.
-
-Next additions include a compatible external capture, drift monitoring, constrained scenario exploration, authentication, and deployment workload controls. Historical v1 artifacts remain available for traceability; [the archived v1 README](docs/history/README_V1.md) describes that earlier experiment.
-
-## Dataset attribution
+### Dataset attribution
 
 Follow the [publisher's dataset page](https://staff.itee.uq.edu.au/marius/NIDS_datasets/) and [v3 temporal-analysis paper](https://arxiv.org/abs/2503.04404) for citations. Academic research reuse includes a commercial-use restriction requiring agreement with the authors. Dataset terms do not constitute a software license for this repository.
