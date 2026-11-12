@@ -1,0 +1,19 @@
+{
+  "dataset": "NF-UNSW-NB15-v3",
+  "source": "https://rdm.uq.edu.au/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f",
+  "description": "This dataset is an enhanced version of NetFlow-based datasets, incorporating 53 extracted features that provide detailed insights into network flows. The dataset includes binary and multi-class labels, distinguishing between normal traffic and nine different types of attacks. It is structured in CSV format, with each row representing a single network flow, labeled accordingly. One of the key aspects of this dataset is the inclusion of temporal features, which allow for a more detailed analysis of traffic over time. The dataset records precise timestamps for each flow, including start and end times, enabling a more structured understanding of flow duration and activity patterns. Additionally, it captures inter-packet arrival time (IPAT) statistics, including minimum, maximum, average, and standard deviation values for both source-to-destination and destination-to-source packet transmissions. ",
+  "license": "Permitted Re-Use with Commercial Use Restriction",
+  "reference": "https://staff.itee.uq.edu.au/marius/NIDS_datasets/",
+  "files": [
+    {
+      "name": "NF-UNSW-NB15-v3.csv",
+      "bytes": 577360958,
+      "sha256": "4ebb97bd74412d566137d95a6fc3ffd8f374f1cf8cfe204d007848e7a668f9b5"
+    },
+    {
+      "name": "NetFlow_v3_Features.csv",
+      "bytes": 2935,
+      "sha256": "abe3ce6e6ff731d72d76e029b512585c0dbcbd8e03ff6dbe2bd04b560723bd67"
+    }
+  ]
+}

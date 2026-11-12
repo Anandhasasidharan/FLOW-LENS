@@ -1,0 +1,131 @@
+{
+  "dataset": "NF-UNSW-NB15-v3",
+  "source_records": 2365424,
+  "features": [
+    "L4_SRC_PORT",
+    "L4_DST_PORT",
+    "PROTOCOL",
+    "L7_PROTO",
+    "IN_BYTES",
+    "IN_PKTS",
+    "OUT_BYTES",
+    "OUT_PKTS",
+    "TCP_FLAGS",
+    "CLIENT_TCP_FLAGS",
+    "SERVER_TCP_FLAGS",
+    "FLOW_DURATION_MILLISECONDS",
+    "DURATION_IN",
+    "DURATION_OUT",
+    "MIN_TTL",
+    "MAX_TTL",
+    "LONGEST_FLOW_PKT",
+    "SHORTEST_FLOW_PKT",
+    "MIN_IP_PKT_LEN",
+    "MAX_IP_PKT_LEN",
+    "SRC_TO_DST_SECOND_BYTES",
+    "DST_TO_SRC_SECOND_BYTES",
+    "RETRANSMITTED_IN_BYTES",
+    "RETRANSMITTED_IN_PKTS",
+    "RETRANSMITTED_OUT_BYTES",
+    "RETRANSMITTED_OUT_PKTS",
+    "SRC_TO_DST_AVG_THROUGHPUT",
+    "DST_TO_SRC_AVG_THROUGHPUT",
+    "NUM_PKTS_UP_TO_128_BYTES",
+    "NUM_PKTS_128_TO_256_BYTES",
+    "NUM_PKTS_256_TO_512_BYTES",
+    "NUM_PKTS_512_TO_1024_BYTES",
+    "NUM_PKTS_1024_TO_1514_BYTES",
+    "TCP_WIN_MAX_IN",
+    "TCP_WIN_MAX_OUT",
+    "ICMP_TYPE",
+    "ICMP_IPV4_TYPE",
+    "DNS_QUERY_TYPE",
+    "DNS_TTL_ANSWER",
+    "FTP_COMMAND_RET_CODE",
+    "SRC_TO_DST_IAT_MIN",
+    "SRC_TO_DST_IAT_MAX",
+    "SRC_TO_DST_IAT_AVG",
+    "SRC_TO_DST_IAT_STDDEV",
+    "DST_TO_SRC_IAT_MIN",
+    "DST_TO_SRC_IAT_MAX",
+    "DST_TO_SRC_IAT_AVG",
+    "DST_TO_SRC_IAT_STDDEV"
+  ],
+  "identifier_columns_excluded": [
+    "Attack",
+    "DNS_QUERY_ID",
+    "FLOW_END_MILLISECONDS",
+    "FLOW_START_MILLISECONDS",
+    "IPV4_DST_ADDR",
+    "IPV4_SRC_ADDR",
+    "Label"
+  ],
+  "split": "Chronological 60/15/10/15 percent by flow-start quantiles, purged at boundaries using flow-end timestamps.",
+  "cutoffs_ms": [
+    1424229622862,
+    1424242209344,
+    1424250496133
+  ],
+  "partitions": {
+    "train": {
+      "records": 1419227,
+      "start_ms": 1421927376907,
+      "end_ms": 1424229622772,
+      "attack_counts": {
+        "Benign": 1376769,
+        "Exploits": 13131,
+        "Fuzzers": 11880,
+        "Generic": 5596,
+        "Reconnaissance": 5380,
+        "Backdoor": 3188,
+        "DoS": 1737,
+        "Shellcode": 982,
+        "Analysis": 514,
+        "Worms": 50
+      }
+    },
+    "validation": {
+      "records": 354790,
+      "start_ms": 1424229622862,
+      "end_ms": 1424242209341,
+      "attack_counts": {
+        "Benign": 321159,
+        "Exploits": 11668,
+        "Fuzzers": 8901,
+        "Generic": 5745,
+        "Reconnaissance": 4335,
+        "DoS": 1919,
+        "Shellcode": 652,
+        "Analysis": 268,
+        "Backdoor": 99,
+        "Worms": 44
+      }
+    },
+    "calibration": {
+      "records": 236522,
+      "start_ms": 1424242209344,
+      "end_ms": 1424250496106,
+      "attack_counts": {
+        "Benign": 216032,
+        "Exploits": 7132,
+        "Fuzzers": 5646,
+        "Generic": 3183,
+        "Reconnaissance": 2810,
+        "DoS": 1089,
+        "Shellcode": 341,
+        "Analysis": 150,
+        "Backdoor": 112,
+        "Worms": 27
+      }
+    },
+    "lockbox": {
+      "records": 354814,
+      "start_ms": 1424250496133,
+      "end_ms": 1424262565011
+    }
+  },
+  "boundary_flows_purged": 71,
+  "selection": "Development only. Prefer native EBM if within 1 percentage point validation average precision and family-balanced detection utility of challenger. Select threshold for macro attack-family recall at <=1% validation benign FPR.",
+  "final_test_rule": "Lockbox predictions are computed once after models, probability policies, and thresholds are frozen. A failed result does not trigger tuning on the lockbox.",
+  "source_sha256": "4ebb97bd74412d566137d95a6fc3ffd8f374f1cf8cfe204d007848e7a668f9b5"
+}

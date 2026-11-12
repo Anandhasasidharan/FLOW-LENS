@@ -21,6 +21,8 @@ if str(ROOT) not in sys.path:
 from src.inference import read_traffic_csv, risk_categories, export_csv
 from src.dashboard import BANDS, filter_traffic, severity_distribution, analysis_report
 from src.network_detector import FEATURES, validate_netflow, score_netflow, display_traffic, tree_explanations
+from src.interpretable_detector import validate_rich_flow
+from app.native_views import model_details as native_model_details, record_terms
 
 logger = logging.getLogger(__name__)
 MODEL_PATH = ROOT / 'models/netflow_detector.joblib'
@@ -31,6 +33,19 @@ st.set_page_config(page_title='FlowLens | Network Intrusion Analysis', page_icon
 
 @st.cache_resource
 def load_model_and_report():
+    v2 = ROOT / 'models/v2'
+    if (v2 / 'final_evaluation.json').exists():
+        development = json.loads((v2 / 'development_report.json').read_text())
+        evaluation = json.loads((v2 / 'final_evaluation.json').read_text())
+        digest = hashlib.sha256((v2 / 'detector.joblib').read_bytes()).hexdigest()
+        if digest != development['artifact_sha256'] or digest != evaluation['artifact_sha256']:
+            raise ValueError('V2 artifact differs from its development or final evaluation report.')
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter('always', InconsistentVersionWarning)
+            bundle = joblib.load(v2 / 'detector.joblib')
+        if bundle['features'] != development['features'] or bundle['features'] != evaluation['features'] or bundle['threshold'] != development['threshold'] or bundle['threshold'] != evaluation['threshold']:
+            raise ValueError('V2 feature schema mismatch.')
+        return bundle, {'schema_version': 2, 'development': development, 'evaluation': evaluation, 'dataset': development['dataset']}, any(isinstance(w.message, InconsistentVersionWarning) for w in caught)
     report = json.loads(REPORT_PATH.read_text())
     if hashlib.sha256(MODEL_PATH.read_bytes()).hexdigest() != report['artifact_sha256']:
         raise ValueError('Model checksum does not match the evaluation report.')
@@ -83,7 +98,9 @@ def render_overview(result, bundle, source):
         st.markdown('**Destination port activity**')
         st.bar_chart(result['service'].value_counts().head(15).rename('Records'), color='#a78bfa')
     st.markdown('**Highest-scoring records**')
-    columns = ['Risk_Score', 'Attack_Probability', 'Predicted_Attack', 'Prediction_Set', 'proto', 'service', 'IN_BYTES', 'OUT_BYTES']
+    columns = ['Risk_Score', 'Attack_Probability', 'Predicted_Attack', 'proto', 'service', 'IN_BYTES', 'OUT_BYTES']
+    if 'Prediction_Set' in result:
+        columns.insert(3, 'Prediction_Set')
     st.dataframe(result.nlargest(5, 'Risk_Score')[columns], use_container_width=True, column_config={
         'Risk_Score': st.column_config.ProgressColumn('Risk index', min_value=0, max_value=10, format='%.2f'),
         'Attack_Probability': st.column_config.NumberColumn('Estimated attack probability', format='%.4f'),
@@ -126,13 +143,17 @@ def render_inspector(result, clean, bundle):
         st.write(f"Estimated attack probability: **{row['Attack_Probability']:.2%}**")
         st.write(f"Binary decision: **{'Attack' if row['Predicted_Attack'] else 'Benign'}**")
         st.caption(f"Decision threshold selected on validation data: {bundle['threshold']:.3f}. Risk display bands use separate 3/7 boundaries.")
-        st.write(f"Experimental prediction set: **{row['Prediction_Set']}**")
-        st.caption('An empty or multi-label set calls for review. Set coverage is not guaranteed on new networks.')
+        if 'Prediction_Set' in result:
+            st.write(f"Experimental prediction set: **{row['Prediction_Set']}**")
+            st.caption('An empty or multi-label set calls for review.')
         st.write(f"Protocol: {row['proto']} · {row['service']}")
     with right:
         st.markdown('**Input features**')
         st.dataframe(clean.loc[record].rename('Value').to_frame(), use_container_width=True)
         st.caption('These are observed measurements. Feature values alone are not explanations or evidence of an attack.')
+    if bundle.get('schema_version') == 2:
+        record_terms(bundle, clean, record)
+        return
     if st.button('Explain selected record', key='explain_record'):
         try:
             with threadpool_limits(limits=2):
@@ -205,30 +226,40 @@ def main():
     st.markdown('NETWORK SECURITY / ANALYSIS WORKSPACE')
     st.title('Traffic risk, in focus.')
     st.write('Explore NetFlow records with a trained attack detector, inspect predictions, and review the evaluation evidence.')
-    st.warning('Research prototype: exploratory benchmark results are measured; the test partition was inspected during development. Fresh external validation is needed. Risk index estimates attack likelihood, not severity.')
+    st.caption('Research prototype · estimated attack likelihood · model-native explanations · risk index is not attack severity')
     try:
         bundle, report, mismatch = load_model_and_report()
     except Exception:
         logger.exception('Unable to load detector and report')
-        st.error('Unable to load the trained detector and its evaluation report. Check the bundled files or run scripts/train_detector.py.')
+        st.error('Unable to load the detector and its evaluation evidence. Check the release files, install requirements.txt, and see the README for reproducible training.')
         return
+    v2 = bundle.get('schema_version') == 2
+    model_features = bundle['features']
+    sample_path = ROOT / 'data/rich_flow_sample.csv' if v2 else SAMPLE_PATH
     with st.sidebar:
         st.header('FlowLens')
         st.caption('NETFLOW RESEARCH PROTOTYPE')
         st.divider()
-        st.write(f"{bundle['model_name']} · {len(FEATURES)} inputs")
+        st.write(f"{bundle['model_name']} · {len(model_features)} inputs")
         st.caption(f"Trained on {report['dataset']}")
         if mismatch:
-            st.warning(f"Model version mismatch. Use scikit-learn {report['scikit_learn']} as specified in requirements.txt.")
+            st.warning(f"Model version mismatch. Use scikit-learn {report.get('scikit_learn', '1.9.0')} as specified in requirements.txt.")
         st.markdown('**Analysis workflow**')
         st.write('1. Load traffic\n2. Review the overview\n3. Filter and inspect records\n4. Check model evidence and export')
         st.divider()
-        explain = st.checkbox('Enable SHAP explanations', value=False)
-        max_samples = st.slider('Rows to explain', 10, 1000, 100, disabled=not explain)
+        if v2:
+            st.success('Native model explanations enabled')
+            explain, max_samples = False, 100
+        else:
+            explain = st.checkbox('Enable SHAP explanations', value=False)
+            max_samples = st.slider('Rows to explain', 10, 1000, 100, disabled=not explain)
         st.caption('Display bands: Low <3, Medium 3–<7, High ≥7. These are not validated alert thresholds.')
     with st.expander('Required NetFlow CSV format'):
-        st.code(', '.join(FEATURES))
-        st.write('Use NetFlow v1 fields from NF-ToN-IoT. All nine inputs must be finite, nonnegative, and complete. Ports, IP protocol identifiers, flags, byte counts, and packet counts must be whole numbers.')
+        st.code(', '.join(model_features))
+        if v2:
+            st.write('Use the rich NetFlow v3 schema shown above. Empty numeric measurements are handled by the fitted model; text and infinite values are rejected. Download the current sample for the exact header.')
+        else:
+            st.write('Use NetFlow v1 fields. All nine inputs must be finite, nonnegative, and complete.')
         st.caption('Duration is in milliseconds; L7_PROTO is the numeric Layer 7 identifier. UTF-8 CSV · maximum 50 MB / 100,000 rows. Extra columns are retained and ignored by the model.')
     with st.container(border=True):
         left, right = st.columns([2, 1])
@@ -237,27 +268,27 @@ def main():
             uploaded = st.file_uploader('Upload traffic CSV', type=['csv'])
         with right:
             st.markdown('**Explore real sample flows**')
-            st.caption('Eight feature-only records drawn from the held-out dataset. They demonstrate inference, not a separate evaluation.')
+            st.caption('Real feature-only development records covering benign traffic and attack families. The final test remains separate from demo data.' if v2 else 'Eight feature-only records drawn from the held-out dataset.')
             if st.button('Load sample traffic', type='primary'):
                 st.session_state['use_sample'] = True
-            st.download_button('Download sample CSV', SAMPLE_PATH.read_bytes(), 'netflow_sample.csv', 'text/csv')
+            st.download_button('Download sample CSV', sample_path.read_bytes(), 'rich_flow_sample.csv' if v2 else 'netflow_sample.csv', 'text/csv')
             if st.session_state.get('use_sample') and st.button('Clear sample'):
                 st.session_state['use_sample'] = False
     if uploaded is not None:
         content, source = uploaded.getvalue(), 'Uploaded CSV'
     elif st.session_state.get('use_sample'):
-        content, source = SAMPLE_PATH.read_bytes(), 'Combined-dataset holdout sample'
+        content, source = sample_path.read_bytes(), 'Development sample' if v2 else 'Combined-dataset holdout sample'
     else:
         st.info('Upload a CSV or choose Load sample traffic to open the analysis workspace.')
         return
     try:
         raw = read_traffic_csv(content)
         raw.index = pd.RangeIndex(1, len(raw) + 1, name='Record')
-        clean = validate_netflow(raw)
+        clean = validate_rich_flow(raw, model_features) if v2 else validate_netflow(raw)
     except ValueError as exc:
         st.error(str(exc))
         return
-    st.success(f'{source} · {len(raw):,} records validated · {len(FEATURES)} model inputs')
+    st.success(f'{source} · {len(raw):,} records validated · {len(model_features)} model inputs')
     try:
         with st.spinner('Scoring traffic…'), threadpool_limits(limits=2):
             scored = score_netflow(bundle, clean)
@@ -270,8 +301,8 @@ def main():
         result[col] = scored[col]
     result['Risk_Category'] = risk_categories(result['Risk_Score'])
     for col, label, value in zip(st.columns(4),
-                                 ('Records analyzed', 'Mean risk index', 'Predicted attack records', 'Uncertain prediction sets'),
-                                 (f'{len(result):,}', f"{result['Risk_Score'].mean():.3f}", int(result['Predicted_Attack'].sum()), int(result['Prediction_Set'].isin(['Empty set — review', 'Benign or Attack']).sum()))):
+                                 ('Records analyzed', 'Mean risk index', 'Predicted attack records', 'High risk records (≥7)' if v2 else 'Uncertain prediction sets'),
+                                 (f'{len(result):,}', f"{result['Risk_Score'].mean():.3f}", int(result['Predicted_Attack'].sum()), int((result['Risk_Score'] >= 7).sum()) if v2 else int(result['Prediction_Set'].isin(['Empty set — review', 'Benign or Attack']).sum()))):
         with col:
             with st.container(border=True):
                 st.metric(label, value)
@@ -283,7 +314,10 @@ def main():
     with inspector:
         render_inspector(result, clean, bundle)
     with details:
-        render_model_details(bundle, report, clean, explain, max_samples)
+        if v2:
+            native_model_details(bundle, report, clean)
+        else:
+            render_model_details(bundle, report, clean, explain, max_samples)
     st.divider()
     st.download_button('Download predictions', export_csv(result), 'threat_predictions.csv', 'text/csv')
     st.caption('Research prototype · no live network monitoring · uploaded traffic is processed in memory by this app.')

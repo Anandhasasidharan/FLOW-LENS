@@ -11,6 +11,8 @@ from src.dashboard import analysis_report, filter_traffic, severity_distribution
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = str(ROOT / 'app/streamlit_visualizer.py')
+APP_SAMPLE = ROOT / ('data/rich_flow_sample.csv' if (ROOT / 'models/v2/final_evaluation.json').exists() else 'data/netflow_sample.csv')
+SAMPLE_COUNT = str(len(pd.read_csv(APP_SAMPLE)))
 
 
 @pytest.fixture
@@ -62,7 +64,7 @@ def load_demo():
 
 def test_demo_load_inspect_and_clear():
     app = load_demo()
-    assert app.metric[0].value == '8'
+    assert app.metric[0].value == SAMPLE_COUNT
     assert [tab.label for tab in app.tabs] == ['Overview', 'Traffic explorer', 'Record inspector', 'Model details']
     app.number_input[0].set_value(2).run(timeout=30)
     assert not app.exception
@@ -81,7 +83,7 @@ def test_protocol_filter_and_empty_state():
     assert set(tables[0]['proto']) == {protocol}
     assert all(i >= 1 for i in tables[0].index)
     # Batch summary remains unchanged by explorer filters.
-    assert app.metric[0].value == '8'
+    assert app.metric[0].value == SAMPLE_COUNT
     app.multiselect[0].set_value([]).run(timeout=30)
     assert not app.exception
     assert any('No records match' in info.value for info in app.info)
@@ -89,7 +91,7 @@ def test_protocol_filter_and_empty_state():
 
 def test_upload_takes_priority_over_loaded_demo():
     app = load_demo()
-    sample = pd.read_csv(ROOT / 'data/netflow_sample.csv').iloc[:1]
+    sample = pd.read_csv(APP_SAMPLE).iloc[:1]
     with patch('streamlit.file_uploader', return_value=io.BytesIO(sample.to_csv(index=False).encode())):
         app.run(timeout=30)
         assert not app.exception
@@ -97,13 +99,18 @@ def test_upload_takes_priority_over_loaded_demo():
         assert any('Uploaded CSV' in item.value for item in app.success)
     app.run(timeout=30)
     assert not app.exception
-    assert app.metric[0].value == '8'
+    assert app.metric[0].value == SAMPLE_COUNT
 
 
 def test_inspector_missing_shap_is_nonfatal():
     app = load_demo()
     with patch.dict('sys.modules', {'shap': None}):
-        button(app, 'Explain selected record').click().run(timeout=30)
+        choices = [b for b in app.button if b.label == 'Explain selected record']
+        if choices:
+            choices[0].click().run(timeout=30)
+            assert any('Record explanation is unavailable' in item.value for item in app.warning)
+        else:
+            app.number_input[0].set_value(2).run(timeout=30)
+            assert any('Why this record received its score' in item.value for item in app.markdown)
     assert not app.exception
     assert not app.error
-    assert any('Record explanation is unavailable' in item.value for item in app.warning)

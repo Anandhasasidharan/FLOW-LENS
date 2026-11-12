@@ -1,6 +1,6 @@
 # Explainability and model research
 
-Research checked on 12 November 2026 using original papers, maintainer documentation, and dataset publishers. This is a targeted literature review, not an exhaustive survey or a claim that a particular method is universally best.
+Research checked on 12 November 2026 using original papers, maintainer documentation, and dataset publishers. **Implementation update:** FlowLens v2 now uses a native Explainable Boosting Machine; [its model card](MODEL_CARD_V2.md) records the richer-data experiment and reserved temporal evaluation. This is a targeted literature review, not an exhaustive survey or a claim that a particular method is universally best.
 
 ## Is there something more advanced than SHAP?
 
@@ -11,7 +11,7 @@ There are methods that answer different questions. SHAP attributes a model outpu
 | Constrained diverse counterfactuals | Shows alternative inputs that change the model output | [DiCE, authors' implementation](https://github.com/interpretml/DiCE), original FAT* 2020 paper | Practical next addition, with fixed protocol/category fields, valid ranges, and networking constraints. A score-changing input is not a mitigation instruction. |
 | Learned-manifold counterfactuals | Tries to keep alternatives closer to the learned tabular distribution | [TABCF](https://arxiv.org/abs/2410.10463), ICAIF 2024 | Research comparison. Its reported experiments use financial datasets; transfer to network flows must be evaluated. Adds VAE training and runtime complexity. |
 | Joint prediction and counterfactual generation | Builds local counterfactual explanations into the classifier | [HyConEx](https://arxiv.org/abs/2503.12525), March 2026 revision; paper identifies Neurocomputing 2026 publication | A verifiable 2026 direction. It is a different classification architecture, not a plugin replacement for explaining an existing forest. No superiority on this project's traffic is established. |
-| Intrinsically interpretable models | Exposes model terms directly, including selected interactions | [Explainable Boosting Machine, InterpretML](https://interpret.ml/docs/ebm.html) | Benchmark an EBM against boosted trees. This is established technology rather than a new 2026 method. Predictive performance still needs independent evaluation. |
+| Intrinsically interpretable models | Exposes model terms directly, including selected interactions | [Explainable Boosting Machine, InterpretML](https://interpret.ml/docs/ebm.html) | Implemented in v2 and compared against LightGBM. Native terms reconstruct the deployed probability, including its sigmoid calibration. EBM is established technology rather than a new 2026 method. |
 | Conformal uncertainty | Returns plausible label sets or regression intervals, with assumptions | [MAPIE theory](https://mapie.readthedocs.io/en/stable/content/conformal-prediction/theory/) | A useful complement to attribution. Standard marginal coverage needs exchangeability; dependent network flows and drift can violate it. Report empirical coverage, set size, and subgroup behavior. |
 | Counterfactuals for prediction sets | Explains changes to the whole conformal label set | [Maalej et al., PMLR 266](https://proceedings.mlr.press/v266/maalej25a.html), August 2025 | A research extension after classifier and uncertainty calibration are independently checked. Changes the question from one class label to uncertainty-aware decisions. |
 
@@ -21,9 +21,11 @@ A 2026 industrial cybersecurity review discusses how operational usefulness and 
 
 Gradient boosting and tree ensembles are sensible tabular baselines. A foundation model is an experiment, not an automatic upgrade. The January 2025 TabPFN paper reports strong small-data results on datasets up to 10,000 samples; that specific result does not justify assuming it wins on millions of correlated network flows. [Hollmann et al., Nature](https://www.nature.com/articles/s41586-024-08328-6)
 
-This repo now compares a trivial baseline, logistic regression, Extra Trees, and histogram gradient boosting under the same split. The final policy selects validation recall subject to a per-source false-positive target; average precision and Brier score break ties. Raw, sigmoid, and isotonic outputs are compared without using test labels for selection. Use validation data for model/threshold selection and a separate calibration set for probability calibration. Compare average precision, ROC AUC, attack recall, benign false-positive rate, Brier score, per-attack recall, and latency on untouched test data. A high accuracy alone is especially weak evidence on imbalanced data.
+V2 now compares a native EBM against rich-feature LightGBM and a nine-input LightGBM reference. Hyperparameters are screened on development samples; finalists use all 1,419,227 training records. A chronological final partition was reserved before development and evaluated after model, calibration, and threshold freezing. [Measured results and interpretation](MODEL_CARD_V2.md).
 
-If an EBM is later added, compare its direct explanations to the selected tree model's SHAP. For counterfactuals, measure validity, sparsity, plausibility, constraint violations, and runtime. For attributions, test sensitivity to background choice and correlated features. These experiments are future research work, not features already validated by this document.
+The earlier v1 experiment compared a prior-only baseline, logistic regression, Extra Trees, and histogram gradient boosting. Its failure on an external source motivated broader evaluation work; those historical results are separate from the v2 benchmark.
+
+V2 uses direct EBM explanations rather than an approximate surrogate. A future study can compare them with a black-box challenger's attributions. For counterfactuals, measure validity, sparsity, plausibility, constraint violations, and runtime. For attributions, test sensitivity to background choice and correlated features. These experiments are future research work, not features already validated by this document.
 
 ## Dataset decision
 
@@ -47,6 +49,6 @@ A new binary attack detector should predict the dataset's real binary label. A 0
 
 ## Implemented experiment and remaining research
 
-The new detector uses nine raw NetFlow inputs and a saved preprocessing pipeline. A failed initial external evaluation motivated combined-source training on NF-ToN-IoT and NF-BoT-IoT. Final holdouts retain difficult ambiguous and repeated patterns; only fitting data are deduplicated. Earlier cleaned-subset experiments are archived and not presented as the final result. Detailed measured results are generated in [MODEL_CARD.md](MODEL_CARD.md).
+The active v2 detector uses 48 raw rich-flow inputs plus eight engineered features and a saved native EBM. Its calibrated additive contributions reconstruct the final deployed probability exactly. It includes global term importance, observed-value feature-effect curves, and separate missing/unknown effects. See [MODEL_CARD_V2.md](MODEL_CARD_V2.md) for the first reserved chronological evaluation and both predictive references.
 
-Implemented explanation/uncertainty tools are optional base-model SHAP, raw-feature permutation importance, calibration comparisons, and experimental split-conformal prediction sets. DiCE, TABCF, HyConEx and EBM comparisons are researched directions, **not implemented or validated features**. A future experiment should benchmark constrained counterfactuals against clear plausibility/validity criteria after fresh external validation of the detector itself.
+The earlier nine-field models and conformal-set experiments remain historical artifacts. DiCE, TABCF, HyConEx and TabPFN remain researched directions rather than implemented or validated features. A future experiment should evaluate constrained counterfactuals for validity, plausibility and feasibility, and test the detector on a separate environment before making cross-network claims.

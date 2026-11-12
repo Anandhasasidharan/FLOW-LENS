@@ -1,0 +1,414 @@
+{
+  "evaluated_at": "2026-11-12T10:56:49.522115+00:00",
+  "artifact_sha256": "b2964e6c5203eaebae90b0451d22cfefdbc2ea87e0defed7600fcc34034c253c",
+  "references_sha256": "9a3c7d054c788bfed3ac2eb9ec0e55a728acbc46a1d6bc0eb52fe1000f0b39ef",
+  "plan_sha256": "45cadbb4e309d9106de7ceff72d274f2df6069b33c6beee3a4fea07043e76bc9",
+  "dataset": "NF-UNSW-NB15-v3",
+  "model_name": "explainable_boosting",
+  "probability_policy": "sigmoid",
+  "threshold": 0.8066374668069524,
+  "features": [
+    "L4_SRC_PORT",
+    "L4_DST_PORT",
+    "PROTOCOL",
+    "L7_PROTO",
+    "IN_BYTES",
+    "IN_PKTS",
+    "OUT_BYTES",
+    "OUT_PKTS",
+    "TCP_FLAGS",
+    "CLIENT_TCP_FLAGS",
+    "SERVER_TCP_FLAGS",
+    "FLOW_DURATION_MILLISECONDS",
+    "DURATION_IN",
+    "DURATION_OUT",
+    "MIN_TTL",
+    "MAX_TTL",
+    "LONGEST_FLOW_PKT",
+    "SHORTEST_FLOW_PKT",
+    "MIN_IP_PKT_LEN",
+    "MAX_IP_PKT_LEN",
+    "SRC_TO_DST_SECOND_BYTES",
+    "DST_TO_SRC_SECOND_BYTES",
+    "RETRANSMITTED_IN_BYTES",
+    "RETRANSMITTED_IN_PKTS",
+    "RETRANSMITTED_OUT_BYTES",
+    "RETRANSMITTED_OUT_PKTS",
+    "SRC_TO_DST_AVG_THROUGHPUT",
+    "DST_TO_SRC_AVG_THROUGHPUT",
+    "NUM_PKTS_UP_TO_128_BYTES",
+    "NUM_PKTS_128_TO_256_BYTES",
+    "NUM_PKTS_256_TO_512_BYTES",
+    "NUM_PKTS_512_TO_1024_BYTES",
+    "NUM_PKTS_1024_TO_1514_BYTES",
+    "TCP_WIN_MAX_IN",
+    "TCP_WIN_MAX_OUT",
+    "ICMP_TYPE",
+    "ICMP_IPV4_TYPE",
+    "DNS_QUERY_TYPE",
+    "DNS_TTL_ANSWER",
+    "FTP_COMMAND_RET_CODE",
+    "SRC_TO_DST_IAT_MIN",
+    "SRC_TO_DST_IAT_MAX",
+    "SRC_TO_DST_IAT_AVG",
+    "SRC_TO_DST_IAT_STDDEV",
+    "DST_TO_SRC_IAT_MIN",
+    "DST_TO_SRC_IAT_MAX",
+    "DST_TO_SRC_IAT_AVG",
+    "DST_TO_SRC_IAT_STDDEV"
+  ],
+  "evaluation_design": "Chronological 60/15/10/15 percent by flow-start quantiles, purged at boundaries using flow-end timestamps.",
+  "test_records": 354814,
+  "selected_model": {
+    "records": 354814,
+    "attack_prevalence": 0.0876712869277988,
+    "average_precision": 0.9999999979332601,
+    "roc_auc": 0.9999999998013814,
+    "precision": 0.9999357099231734,
+    "recall": 1.0,
+    "f1": 0.9999678539282499,
+    "false_positive_rate": 6.178426787187179e-06,
+    "brier": 6.799029202877091e-06,
+    "log_loss": 4.810273922234112e-05,
+    "confusion_matrix": [
+      [
+        323705,
+        2
+      ],
+      [
+        0,
+        31107
+      ]
+    ],
+    "inference_seconds": 1.824000275999424,
+    "per_family": {
+      "Analysis": {
+        "records": 294,
+        "binary_correctness": 1.0
+      },
+      "Backdoor": {
+        "records": 1260,
+        "binary_correctness": 1.0
+      },
+      "Benign": {
+        "records": 323707,
+        "binary_correctness": 0.9999938215732128
+      },
+      "DoS": {
+        "records": 1234,
+        "binary_correctness": 1.0
+      },
+      "Exploits": {
+        "records": 10815,
+        "binary_correctness": 1.0
+      },
+      "Fuzzers": {
+        "records": 7387,
+        "binary_correctness": 1.0
+      },
+      "Generic": {
+        "records": 5126,
+        "binary_correctness": 1.0
+      },
+      "Reconnaissance": {
+        "records": 4548,
+        "binary_correctness": 1.0
+      },
+      "Shellcode": {
+        "records": 406,
+        "binary_correctness": 1.0
+      },
+      "Worms": {
+        "records": 37,
+        "binary_correctness": 1.0
+      }
+    },
+    "macro_attack_recall": 1.0,
+    "reliability_bins": [
+      {
+        "bin": 0,
+        "records": 323702,
+        "mean_probability": 1.3370939375907882e-05,
+        "attack_fraction": 0.0
+      },
+      {
+        "bin": 1,
+        "records": 1,
+        "mean_probability": 0.12016063518043871,
+        "attack_fraction": 0.0
+      },
+      {
+        "bin": 4,
+        "records": 1,
+        "mean_probability": 0.47793560798941265,
+        "attack_fraction": 0.0
+      },
+      {
+        "bin": 6,
+        "records": 1,
+        "mean_probability": 0.6224184278922233,
+        "attack_fraction": 0.0
+      },
+      {
+        "bin": 8,
+        "records": 1,
+        "mean_probability": 0.8076004595743651,
+        "attack_fraction": 1.0
+      },
+      {
+        "bin": 9,
+        "records": 31108,
+        "mean_probability": 0.9998016929286528,
+        "attack_fraction": 0.9999357078565
+      }
+    ],
+    "expected_calibration_error": 2.7930268830477165e-05
+  },
+  "references": {
+    "nine_input_lightgbm": {
+      "records": 354814,
+      "attack_prevalence": 0.0876712869277988,
+      "average_precision": 0.9999828206538423,
+      "roc_auc": 0.9999984551450302,
+      "precision": 0.9857400893621067,
+      "recall": 1.0,
+      "f1": 0.9928188433550363,
+      "false_positive_rate": 0.001390146027117115,
+      "brier": 0.0003142511796830328,
+      "log_loss": 0.0010639866948381539,
+      "confusion_matrix": [
+        [
+          323257,
+          450
+        ],
+        [
+          0,
+          31107
+        ]
+      ],
+      "inference_seconds": 1.0484158660001412,
+      "per_family": {
+        "Analysis": {
+          "records": 294,
+          "binary_correctness": 1.0
+        },
+        "Backdoor": {
+          "records": 1260,
+          "binary_correctness": 1.0
+        },
+        "Benign": {
+          "records": 323707,
+          "binary_correctness": 0.9986098539728829
+        },
+        "DoS": {
+          "records": 1234,
+          "binary_correctness": 1.0
+        },
+        "Exploits": {
+          "records": 10815,
+          "binary_correctness": 1.0
+        },
+        "Fuzzers": {
+          "records": 7387,
+          "binary_correctness": 1.0
+        },
+        "Generic": {
+          "records": 5126,
+          "binary_correctness": 1.0
+        },
+        "Reconnaissance": {
+          "records": 4548,
+          "binary_correctness": 1.0
+        },
+        "Shellcode": {
+          "records": 406,
+          "binary_correctness": 1.0
+        },
+        "Worms": {
+          "records": 37,
+          "binary_correctness": 1.0
+        }
+      },
+      "macro_attack_recall": 1.0,
+      "reliability_bins": [
+        {
+          "bin": 0,
+          "records": 323665,
+          "mean_probability": 2.756552579147817e-05,
+          "attack_fraction": 1.544807130829716e-05
+        },
+        {
+          "bin": 1,
+          "records": 30,
+          "mean_probability": 0.14917877125217435,
+          "attack_fraction": 0.43333333333333335
+        },
+        {
+          "bin": 2,
+          "records": 105,
+          "mean_probability": 0.24824328563404985,
+          "attack_fraction": 0.9714285714285714
+        },
+        {
+          "bin": 3,
+          "records": 25,
+          "mean_probability": 0.35467623598072956,
+          "attack_fraction": 0.84
+        },
+        {
+          "bin": 4,
+          "records": 23,
+          "mean_probability": 0.458715900072656,
+          "attack_fraction": 0.7391304347826086
+        },
+        {
+          "bin": 5,
+          "records": 22,
+          "mean_probability": 0.5573317166835747,
+          "attack_fraction": 0.8636363636363636
+        },
+        {
+          "bin": 6,
+          "records": 36,
+          "mean_probability": 0.6490770453721021,
+          "attack_fraction": 0.8611111111111112
+        },
+        {
+          "bin": 7,
+          "records": 31,
+          "mean_probability": 0.7616063197618961,
+          "attack_fraction": 0.9354838709677419
+        },
+        {
+          "bin": 8,
+          "records": 184,
+          "mean_probability": 0.8699979695607694,
+          "attack_fraction": 0.9891304347826086
+        },
+        {
+          "bin": 9,
+          "records": 30693,
+          "mean_probability": 0.9985934723826599,
+          "attack_fraction": 0.9998370964063468
+        }
+      ],
+      "expected_calibration_error": 0.000526520302529647
+    },
+    "rich_lightgbm": {
+      "records": 354814,
+      "attack_prevalence": 0.0876712869277988,
+      "average_precision": 0.999999995866786,
+      "roc_auc": 0.9999999996027629,
+      "precision": 0.9998714281122433,
+      "recall": 1.0,
+      "f1": 0.9999357099231734,
+      "false_positive_rate": 1.2356853574374358e-05,
+      "brier": 1.082536724020708e-05,
+      "log_loss": 3.7733096373461565e-05,
+      "confusion_matrix": [
+        [
+          323703,
+          4
+        ],
+        [
+          0,
+          31107
+        ]
+      ],
+      "inference_seconds": 2.1703113020003,
+      "per_family": {
+        "Analysis": {
+          "records": 294,
+          "binary_correctness": 1.0
+        },
+        "Backdoor": {
+          "records": 1260,
+          "binary_correctness": 1.0
+        },
+        "Benign": {
+          "records": 323707,
+          "binary_correctness": 0.9999876431464256
+        },
+        "DoS": {
+          "records": 1234,
+          "binary_correctness": 1.0
+        },
+        "Exploits": {
+          "records": 10815,
+          "binary_correctness": 1.0
+        },
+        "Fuzzers": {
+          "records": 7387,
+          "binary_correctness": 1.0
+        },
+        "Generic": {
+          "records": 5126,
+          "binary_correctness": 1.0
+        },
+        "Reconnaissance": {
+          "records": 4548,
+          "binary_correctness": 1.0
+        },
+        "Shellcode": {
+          "records": 406,
+          "binary_correctness": 1.0
+        },
+        "Worms": {
+          "records": 37,
+          "binary_correctness": 1.0
+        }
+      },
+      "macro_attack_recall": 1.0,
+      "reliability_bins": [
+        {
+          "bin": 0,
+          "records": 323702,
+          "mean_probability": 1.5020366933265829e-06,
+          "attack_fraction": 0.0
+        },
+        {
+          "bin": 3,
+          "records": 1,
+          "mean_probability": 0.3713434460106269,
+          "attack_fraction": 0.0
+        },
+        {
+          "bin": 5,
+          "records": 1,
+          "mean_probability": 0.5422763663208944,
+          "attack_fraction": 1.0
+        },
+        {
+          "bin": 8,
+          "records": 1,
+          "mean_probability": 0.8894333652249811,
+          "attack_fraction": 0.0
+        },
+        {
+          "bin": 9,
+          "records": 31109,
+          "mean_probability": 0.9999702228677354,
+          "attack_fraction": 0.9999035648847601
+        }
+      ],
+      "expected_calibration_error": 1.2058080907173046e-05
+    }
+  },
+  "quality_checks": {
+    "attack_recall_at_least_95_percent": true,
+    "benign_false_positive_rate_at_most_1_percent": true,
+    "macro_attack_recall_at_least_90_percent": true,
+    "every_attack_family_at_least_90_percent": true,
+    "all_development_families_have_test_support": true,
+    "native_additive_explanation_verified": true
+  },
+  "status": "benchmark_targets_met",
+  "absent_families": [],
+  "limitations": [
+    "This is a chronological holdout from one laboratory dataset, not a live deployment or a cross-dataset result.",
+    "The original traffic dates to 2015; richer extraction and a newer model do not make the traffic contemporary.",
+    "Per-family rates describe binary detection, not attack-family classification.",
+    "Rare-family estimates need more independent examples; correlated flows do not provide independent trials.",
+    "Feature contributions explain this fitted model and do not establish causal effects or remediation advice."
+  ]
+}

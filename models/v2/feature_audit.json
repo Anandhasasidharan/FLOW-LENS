@@ -1,0 +1,24 @@
+{
+  "forbidden_identifier_or_target_inputs": [],
+  "raw_feature_count": 48,
+  "term_count": 56,
+  "interaction_count": 0,
+  "top_terms": {
+    "L4_DST_PORT": 3.4218000458612745,
+    "L7_PROTO": 2.6227938398734594,
+    "DNS_QUERY_TYPE": 2.026939269970918,
+    "DNS_TTL_ANSWER": 1.9897957841158047,
+    "TCP_FLAGS": 1.9023521833546437,
+    "MIN_TTL": 1.8458595724544047,
+    "CLIENT_TCP_FLAGS": 1.4074466234637784,
+    "PROTOCOL": 1.3024888197367297,
+    "SRC_TO_DST_AVG_THROUGHPUT": 1.1891171073729785,
+    "SERVER_TCP_FLAGS": 1.0833076159931405,
+    "L4_SRC_PORT": 1.0666266345020585,
+    "BYTES_PER_SECOND": 0.8412785922694518,
+    "DST_TO_SRC_SECOND_BYTES": 0.8152484099561325,
+    "TCP_WIN_MAX_IN": 0.7648075528569759,
+    "ICMP_TYPE": 0.7645000844037676
+  },
+  "interpretation": "Dominant terms can include lab-specific signatures. Strong within-dataset performance does not establish cross-network causality or generalization."
+}

@@ -36,23 +36,25 @@ def score_netflow(bundle, clean):
     if ((probabilities < 0) | (probabilities > 1)).any() or not np.allclose(probabilities.sum(axis=1), 1):
         raise ValueError('The model returned invalid probabilities.')
     attack = probabilities[:, 1]
-    sets = (1 - probabilities) <= bundle['conformal_q']
-    labels = np.array(['Empty set — review', 'Benign', 'Attack', 'Benign or Attack'])
-    codes = sets[:, 0].astype(int) + 2 * sets[:, 1].astype(int)
-    return pd.DataFrame({
+    result = pd.DataFrame({
         'Attack_Probability': attack,
         'Risk_Score': attack * 10,
         'Predicted_Attack': attack >= bundle['threshold'],
-        'Prediction_Set': labels[codes],
     }, index=clean.index)
+    if 'conformal_q' in bundle:
+        sets = (1 - probabilities) <= bundle['conformal_q']
+        labels = np.array(['Empty set — review', 'Benign', 'Attack', 'Benign or Attack'])
+        codes = sets[:, 0].astype(int) + 2 * sets[:, 1].astype(int)
+        result['Prediction_Set'] = labels[codes]
+    return result
 
 
 def display_traffic(raw, clean):
     """Actual NetFlow values exposed under dashboard display names only."""
     view = raw.copy()
     view['proto'] = clean['PROTOCOL'].map({1: 'icmp', 6: 'tcp', 17: 'udp'}).fillna('other')
-    view['service'] = clean['L4_DST_PORT'].map(lambda port: f'Port {int(port)}')
-    view['state'] = clean['TCP_FLAGS'].map(lambda flag: f'TCP flags {int(flag)}')
+    view['service'] = clean['L4_DST_PORT'].map(lambda port: f'Port {int(port)}' if pd.notna(port) else 'Unknown port')
+    view['state'] = clean['TCP_FLAGS'].map(lambda flag: f'TCP flags {int(flag)}' if pd.notna(flag) else 'Unknown flags')
     view['duration'] = clean['FLOW_DURATION_MILLISECONDS'] / 1000
     for alias, original in [('sbytes', 'IN_BYTES'), ('dbytes', 'OUT_BYTES'), ('spkts', 'IN_PKTS'), ('dpkts', 'OUT_PKTS')]:
         view[alias] = clean[original]

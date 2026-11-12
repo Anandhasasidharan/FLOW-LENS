@@ -13,6 +13,7 @@ from src.inference import read_traffic_csv, predict_severity, risk_categories, e
 
 ROOT = Path(__file__).resolve().parents[1]
 FEATURES = pd.read_csv(ROOT / 'data/feature_columns.csv').feature.tolist()
+APP_SAMPLE = ROOT / ('data/rich_flow_sample.csv' if (ROOT / 'models/v2/final_evaluation.json').exists() else 'data/netflow_sample.csv')
 
 
 @pytest.fixture
@@ -98,11 +99,11 @@ def test_app_starts_outside_repo(monkeypatch, tmp_path):
     app = AppTest.from_file(str(ROOT / 'app/streamlit_visualizer.py')).run(timeout=30)
     assert not app.exception
     assert not app.error
-    assert any('Research prototype' in w.value for w in app.warning)
+    assert any('Research prototype' in c.value for c in app.caption)
 
 
 def test_app_upload_success():
-    uploaded = io.BytesIO((ROOT / 'data/netflow_sample.csv').read_bytes())
+    uploaded = io.BytesIO(APP_SAMPLE.read_bytes())
     with patch('streamlit.file_uploader', return_value=uploaded):
         app = AppTest.from_file(str(ROOT / 'app/streamlit_visualizer.py')).run(timeout=30)
     assert not app.exception
@@ -115,16 +116,13 @@ def test_app_rejects_incomplete_upload():
     with patch('streamlit.file_uploader', return_value=io.BytesIO(b'duration\n0.1')):
         app = AppTest.from_file(str(ROOT / 'app/streamlit_visualizer.py')).run(timeout=30)
     assert not app.exception
-    assert 'Missing required columns' in app.error[0].value
+    assert 'Missing required' in app.error[0].value
     assert not app.metric
 
 
 def test_missing_shap_is_nonfatal():
-    uploaded = io.BytesIO((ROOT / 'data/netflow_sample.csv').read_bytes())
-    with patch('streamlit.file_uploader', return_value=uploaded), patch.dict('sys.modules', {'shap': None}):
-        app = AppTest.from_file(str(ROOT / 'app/streamlit_visualizer.py')).run(timeout=30)
-        app.checkbox[0].check().run(timeout=30)
+    with patch.dict('sys.modules', {'shap': None}):
+        app = AppTest.from_string("from app.streamlit_visualizer import show_explanations\nimport pandas as pd\nshow_explanations({}, pd.DataFrame({'x':[1]}), 1)").run(timeout=30)
     assert not app.exception
     assert not app.error
-    assert len(app.metric) == 4
     assert any('SHAP is unavailable' in w.value for w in app.warning)
